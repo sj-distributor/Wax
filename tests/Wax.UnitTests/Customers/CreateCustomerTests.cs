@@ -1,8 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Mediator.Net.Context;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Shouldly;
 using Wax.Core.Entities.Customers;
+using Wax.Core.Handlers.CommandHandlers.Customers;
 using Wax.Core.Services.Customers;
 using Wax.Core.Services.Customers.Exceptions;
 using Wax.Messages.Commands.Customers;
@@ -13,12 +16,12 @@ namespace Wax.UnitTests.Customers;
 public class CreateCustomerTests
 {
     private readonly ICustomerDataProvider _mockCustomerDataProvider;
-    private readonly ICustomerService _customerService;
+    private readonly CreateCustomerCommandHandler _handler;
 
     public CreateCustomerTests()
     {
         _mockCustomerDataProvider = Substitute.For<ICustomerDataProvider>();
-        _customerService = new CustomerService(_mockCustomerDataProvider);
+        _handler = new CreateCustomerCommandHandler(_mockCustomerDataProvider);
     }
 
     [Fact]
@@ -32,29 +35,23 @@ public class CreateCustomerTests
         _mockCustomerDataProvider.GetByNameAsync(command.Name).Returns(new Customer());
 
         await Should.ThrowAsync<CustomerNameAlreadyExistsException>(async () =>
-            await _customerService.CreateAsync(command));
+            await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None));
     }
 
     [Fact]
     public async Task ShouldCreateNewCustomer()
     {
         var callCounter = 0;
-        
+
         var command = new CreateCustomerCommand
         {
             Name = "microsoft"
         };
 
         _mockCustomerDataProvider.GetByNameAsync(command.Name).ReturnsNull();
-        
-        _mockCustomerDataProvider.When(x => x.AddAsync(Arg.Any<Customer>())).Do(_ =>
-        {
-            callCounter++;
-        });
+        _mockCustomerDataProvider.When(x => x.AddAsync(Arg.Any<Customer>())).Do(_ => callCounter++);
 
-        var @event = await _customerService.CreateAsync(command);
-        @event.Name.ShouldBe(command.Name);
-       
+        await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None);
         callCounter.ShouldBe(1);
     }
 }

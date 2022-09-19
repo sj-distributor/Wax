@@ -1,25 +1,37 @@
 ﻿using Mediator.Net.Context;
 using Mediator.Net.Contracts;
+using Wax.Core.Entities.Customers;
 using Wax.Core.Services.Customers;
+using Wax.Core.Services.Customers.Exceptions;
 using Wax.Messages.Commands.Customers;
-using Wax.Messages.Events.Customers;
 
 namespace Wax.Core.Handlers.CommandHandlers.Customers
 {
     public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerCommand>
     {
-        private readonly ICustomerService _customerService;
+        private readonly ICustomerDataProvider _customerDataProvider;
 
-        public CreateCustomerCommandHandler(ICustomerService customerService)
+        public CreateCustomerCommandHandler(ICustomerDataProvider customerDataProvider)
         {
-            _customerService = customerService;
+            _customerDataProvider = customerDataProvider;
         }
 
         public async Task Handle(IReceiveContext<CreateCustomerCommand> context, CancellationToken cancellationToken)
         {
-            var @event = await _customerService.CreateAsync(context.Message);
+            var customer = await _customerDataProvider.GetByNameAsync(context.Message.Name);
 
-            await context.PublishAsync(@event, cancellationToken);
+            if (customer != null)
+            {
+                throw new CustomerNameAlreadyExistsException();
+            }
+
+            customer = new Customer
+            {
+                Id = Guid.NewGuid(),
+                Name = context.Message.Name
+            };
+
+            await _customerDataProvider.AddAsync(customer);
         }
     }
 }

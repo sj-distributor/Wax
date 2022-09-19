@@ -8,4 +8,3 @@ namespace Wax.Core.Services.Customers
         Task<Customer> AddAsync(Customer customer);
     }
 }
-    
