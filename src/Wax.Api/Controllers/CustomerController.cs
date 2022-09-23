@@ -1,11 +1,13 @@
 using Mediator.Net;
 using Microsoft.AspNetCore.Mvc;
 using Wax.Messages.Commands.Customers;
+using Wax.Messages.Dtos.Customers;
+using Wax.Messages.Requests.Customers;
 
 namespace Wax.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("customers")]
     public class CustomerController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -15,8 +17,25 @@ namespace Wax.Api.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet]
+        [ProducesResponseType(typeof(CustomerShortInfo), 200)]
+        public async Task<IActionResult> GetListAsync()
+        {
+            var response = await _mediator.RequestAsync<GetCustomerRequest, GetCustomerResponse>(
+                new GetCustomerRequest());
+
+            return Ok(response);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] CreateCustomerCommand command)
+        {
+            await _mediator.SendAsync(command);
+            return Ok();
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateAsync([FromBody] UpdateCustomerCommand command)
         {
             await _mediator.SendAsync(command);
             return Ok();

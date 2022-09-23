@@ -1,6 +1,7 @@
-﻿using Mediator.Net.Context;
+﻿using AutoMapper;
+using Mediator.Net.Context;
 using Mediator.Net.Contracts;
-using Wax.Core.Entities.Customers;
+using Wax.Core.Domain.Customers;
 using Wax.Core.Services.Customers;
 using Wax.Core.Services.Customers.Exceptions;
 using Wax.Messages.Commands.Customers;
@@ -9,29 +10,23 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers
 {
     public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerCommand>
     {
+        private readonly IMapper _mapper;
         private readonly ICustomerDataProvider _customerDataProvider;
 
-        public CreateCustomerCommandHandler(ICustomerDataProvider customerDataProvider)
+        public CreateCustomerCommandHandler(IMapper mapper, ICustomerDataProvider customerDataProvider)
         {
+            _mapper = mapper;
             _customerDataProvider = customerDataProvider;
         }
 
         public async Task Handle(IReceiveContext<CreateCustomerCommand> context, CancellationToken cancellationToken)
         {
-            var customer = await _customerDataProvider.GetByNameAsync(context.Message.Name);
-
-            if (customer != null)
+            if (!await _customerDataProvider.CheckIsUniqueNameAsync(context.Message.Name))
             {
                 throw new CustomerNameAlreadyExistsException();
             }
 
-            customer = new Customer
-            {
-                Id = Guid.NewGuid(),
-                Name = context.Message.Name
-            };
-
-            await _customerDataProvider.AddAsync(customer);
+            await _customerDataProvider.AddAsync(_mapper.Map<Customer>(context.Message));
         }
     }
 }

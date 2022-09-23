@@ -1,6 +1,8 @@
-﻿namespace Wax.Core.Services.Identity
+﻿using Wax.Core.DependencyInjection;
+
+namespace Wax.Core.Services.Identity
 {
-    public interface ICurrentUser
+    public interface ICurrentUser : IScopedDependency
     {
         string Id { get; }
     }

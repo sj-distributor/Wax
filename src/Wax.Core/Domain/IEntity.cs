@@ -1,4 +1,4 @@
-﻿namespace Wax.Core.Entities
+﻿namespace Wax.Core.Domain
 {
     public interface IEntity
     {
