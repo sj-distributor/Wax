@@ -3,7 +3,9 @@ using Autofac;
 using AutoMapper.Contrib.Autofac.DependencyInjection;
 using Mediator.Net;
 using Mediator.Net.Autofac;
+using Mediator.Net.Middlewares.Serilog;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Wax.Core.Data;
 using Wax.Core.DependencyInjection;
 using Wax.Core.Processing.FluentMessageValidator;
@@ -14,14 +16,21 @@ namespace Wax.Core
 {
     public class ApplicationModule : Module
     {
+        private readonly ILogger _logger;
         private readonly ICurrentUser _currentUser;
+        private readonly string _connectionString;
         private readonly Assembly[] _assemblies;
 
-        public ApplicationModule(ICurrentUser currentUser, params Assembly[] assemblies)
+        public ApplicationModule(ILogger logger, ICurrentUser currentUser, string connectionString,
+            params Assembly[] assemblies)
         {
+            _logger = logger;
             _currentUser = currentUser;
-            _assemblies = assemblies ?? Array.Empty<Assembly>();
-            _assemblies = _assemblies.Concat(new[] { typeof(ApplicationModule).Assembly }).ToArray();
+            _connectionString = connectionString;
+
+            _assemblies = (assemblies ?? Array.Empty<Assembly>())
+                .Concat(new[] { typeof(ApplicationModule).Assembly })
+                .ToArray();
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -30,6 +39,7 @@ namespace Wax.Core
             RegisterDependency(builder);
             RegisterDatabase(builder);
             RegisterIdentity(builder);
+            RegisterLogger(builder);
             RegisterMediator(builder);
             RegisterValidator(builder);
         }
@@ -55,10 +65,15 @@ namespace Wax.Core
             }
         }
 
-        private static void RegisterDatabase(ContainerBuilder builder)
+        private void RegisterDatabase(ContainerBuilder builder)
         {
             builder.Register(c =>
                 {
+                    if (!string.IsNullOrEmpty(_connectionString))
+                    {
+                        //Select your database provider
+                    }
+                    
                     var optionBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
                     optionBuilder.UseInMemoryDatabase("__wax_database");
@@ -73,12 +88,23 @@ namespace Wax.Core
             builder.RegisterInstance(_currentUser);
         }
 
+        private void RegisterLogger(ContainerBuilder builder)
+        {
+            builder.RegisterInstance(_logger)
+                .As<ILogger>()
+                .SingleInstance();
+        }
+
         private void RegisterMediator(ContainerBuilder builder)
         {
             var mediatorBuilder = new MediatorBuilder();
 
             mediatorBuilder.RegisterHandlers(_assemblies);
-            mediatorBuilder.ConfigureGlobalReceivePipe(c => { c.UseMessageValidator(); });
+            mediatorBuilder.ConfigureGlobalReceivePipe(c =>
+            {
+                c.UseSerilog(logger: _logger);
+                c.UseMessageValidator();
+            });
 
             builder.RegisterMediator(mediatorBuilder);
         }

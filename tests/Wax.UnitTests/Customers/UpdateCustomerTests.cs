@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using Mediator.Net.Context;
 using NSubstitute;
 using Shouldly;
@@ -21,11 +22,11 @@ public class UpdateCustomerTests
 
     public UpdateCustomerTests()
     {
+        var mapper = new MapperConfiguration(x => x.AddProfile(new CustomerProfile())).CreateMapper();
+            
         _mockCustomerDataProvider = Substitute.For<ICustomerDataProvider>();
 
-        _handler = new UpdateCustomerCommandHandler(
-            TestUtil.CreateMapper(new CustomerProfile()),
-            _mockCustomerDataProvider);
+        _handler = new UpdateCustomerCommandHandler(mapper, _mockCustomerDataProvider);
     }
 
     [Fact]
