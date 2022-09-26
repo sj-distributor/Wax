@@ -10,21 +10,17 @@ namespace Wax.Api;
 public class Startup
 {
     private IConfiguration Configuration { get; }
-    
+
     private IServiceCollection _serviceCollection;
 
     public Startup(IConfiguration configuration)
     {
         Configuration = configuration;
-        
-        Log.Logger =  new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .Enrich.FromLogContext()
-            .Enrich.WithCorrelationId()
-            .Enrich.WithProperty("Application", "Wax.Api")
-            .WriteTo.Console()
+
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(Configuration)
             .CreateLogger();
-        
+
         Log.Information("Starting up");
     }
 
@@ -37,7 +33,7 @@ public class Startup
         services.AddCustomSwagger();
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddLogging();
-        
+
         _serviceCollection = services;
     }
 
@@ -55,17 +51,17 @@ public class Startup
         // Register your own things directly with Autofac here. Don't
         // call builder.Populate(), that happens in AutofacServiceProviderFactory
         // for you.
-
-         builder.RegisterModule(new ApplicationModule(Log.Logger, currentUser, connectionString, typeof(Startup).Assembly));
+        builder.RegisterModule(new ApplicationModule(Log.Logger, currentUser, connectionString,
+            typeof(Startup).Assembly));
     }
 
     // Configure is where you add middleware. This is called after
     // ConfigureContainer. You can use IApplicationBuilder.ApplicationServices
     // here if you need to resolve things from the container.
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env,ILoggerFactory loggerFactory)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
     {
         loggerFactory.AddSerilog();
-        
+
         if (env.IsDevelopment())
         {
             app.UseSwagger();
@@ -74,5 +70,6 @@ public class Startup
 
         app.UseRouting();
         app.UseCors();
+        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
     }
 }

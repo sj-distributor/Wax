@@ -26,9 +26,9 @@ namespace Wax.Core.Services.Customers
             return customer;
         }
 
-        public Task<bool> CheckIsUniqueNameAsync(string name)
+        public async Task<bool> CheckIsUniqueNameAsync(string name)
         {
-            return _dbContext.Set<Customer>().AnyAsync(c => c.Name == name);
+            return !await _dbContext.Set<Customer>().AnyAsync(c => c.Name == name);
         }
 
         public async Task<Customer> AddAsync(Customer customer)

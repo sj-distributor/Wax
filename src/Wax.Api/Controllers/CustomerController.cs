@@ -17,12 +17,12 @@ namespace Wax.Api.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet]
+        [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(CustomerShortInfo), 200)]
-        public async Task<IActionResult> GetListAsync()
+        public async Task<IActionResult> GetListAsync(Guid id)
         {
             var response = await _mediator.RequestAsync<GetCustomerRequest, GetCustomerResponse>(
-                new GetCustomerRequest());
+                new GetCustomerRequest { CustomerId = id });
 
             return Ok(response);
         }
