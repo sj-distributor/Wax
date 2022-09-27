@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Wax.Messages.Commands.Customers;
 using Wax.Messages.Dtos.Customers;
 using Wax.Messages.Requests.Customers;
+using ILogger = Serilog.ILogger;
 
 namespace Wax.Api.Controllers
 {
@@ -11,10 +12,12 @@ namespace Wax.Api.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ILogger _logger;
 
-        public CustomerController(IMediator mediator)
+        public CustomerController(IMediator mediator,ILogger logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
         [HttpGet("{id:guid}")]
@@ -30,8 +33,8 @@ namespace Wax.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] CreateCustomerCommand command)
         {
-            await _mediator.SendAsync(command);
-            return Ok();
+            var response = await _mediator.SendAsync<CreateCustomerCommand, CreateCustomerResponse>(command);
+            return Ok(response);
         }
 
         [HttpPut]

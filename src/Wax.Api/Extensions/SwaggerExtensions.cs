@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using Microsoft.OpenApi.Models;
-using Wax.Messages;
+﻿using Microsoft.OpenApi.Models;
 
 namespace Wax.Api.Extensions;
 

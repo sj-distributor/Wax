@@ -16,7 +16,7 @@ namespace Wax.Core.Services.Customers
 
         public async Task<Customer> GetByIdAsync(Guid id)
         {
-            var customer = await _dbContext.Set<Customer>().FindAsync(id);
+            var customer = await _dbContext.Set<Customer>().FindAsync(id).ConfigureAwait(false);
 
             if (customer == null)
             {
@@ -28,7 +28,7 @@ namespace Wax.Core.Services.Customers
 
         public async Task<bool> CheckIsUniqueNameAsync(string name)
         {
-            return !await _dbContext.Set<Customer>().AnyAsync(c => c.Name == name);
+            return !await _dbContext.Set<Customer>().AnyAsync(c => c.Name == name).ConfigureAwait(false);
         }
 
         public async Task<Customer> AddAsync(Customer customer)

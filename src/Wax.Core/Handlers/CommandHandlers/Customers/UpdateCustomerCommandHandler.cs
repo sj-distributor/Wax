@@ -20,11 +20,11 @@ public class UpdateCustomerCommandHandler : ICommandHandler<UpdateCustomerComman
 
     public async Task Handle(IReceiveContext<UpdateCustomerCommand> context, CancellationToken cancellationToken)
     {
-        var customer = await _customerDataProvider.GetByIdAsync(context.Message.CustomerId);
+        var customer = await _customerDataProvider.GetByIdAsync(context.Message.CustomerId).ConfigureAwait(false);
 
         if (customer.Name != context.Message.Name)
         {
-            if (!await _customerDataProvider.CheckIsUniqueNameAsync(context.Message.Name))
+            if (!await _customerDataProvider.CheckIsUniqueNameAsync(context.Message.Name).ConfigureAwait(false))
             {
                 throw new CustomerNameAlreadyExistsException();
             }
@@ -32,6 +32,6 @@ public class UpdateCustomerCommandHandler : ICommandHandler<UpdateCustomerComman
 
         _mapper.Map(context.Message, customer);
 
-        await _customerDataProvider.UpdateAsync(customer);
+        await _customerDataProvider.UpdateAsync(customer).ConfigureAwait(false);
     }
 }

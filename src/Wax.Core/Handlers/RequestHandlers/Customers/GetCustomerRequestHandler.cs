@@ -29,7 +29,7 @@ public class GetCustomerRequestHandler : IRequestHandler<GetCustomerRequest, Get
             Customer = await _dbContext.Set<Customer>()
                 .Where(c => c.Id == context.Message.CustomerId)
                 .ProjectTo<CustomerShortInfo>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(cancellationToken)
+                .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false)
         };
     }
 }
