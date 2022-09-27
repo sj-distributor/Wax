@@ -3,6 +3,7 @@ using Wax.Api.Authentication;
 using Wax.Api.Extensions;
 using Wax.Core.Services.Identity;
 using Serilog;
+using Wax.Api.Filters;
 using Wax.Core;
 
 namespace Wax.Api;
@@ -28,7 +29,10 @@ public class Startup
     // called by the runtime before the ConfigureContainer method, below.
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddControllers();
+        services.AddControllers(options =>
+        {
+            options.Filters.Add<GlobalExceptionFilter>();
+        });
         services.AddOptions();
         services.AddCustomSwagger();
         services.AddScoped<ICurrentUser, CurrentUser>();

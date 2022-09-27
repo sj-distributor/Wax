@@ -12,12 +12,10 @@ namespace Wax.Api.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly ILogger _logger;
 
-        public CustomerController(IMediator mediator,ILogger logger)
+        public CustomerController(IMediator mediator)
         {
             _mediator = mediator;
-            _logger = logger;
         }
 
         [HttpGet("{id:guid}")]
