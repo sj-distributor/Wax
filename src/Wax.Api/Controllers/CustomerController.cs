@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Wax.Messages.Commands.Customers;
 using Wax.Messages.Dtos.Customers;
 using Wax.Messages.Requests.Customers;
-using ILogger = Serilog.ILogger;
 
 namespace Wax.Api.Controllers
 {
