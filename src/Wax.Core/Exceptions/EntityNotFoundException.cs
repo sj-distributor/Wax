@@ -2,9 +2,6 @@
 {
     public class EntityNotFoundException : Exception
     {
-        public Type EntityType { get; }
-        public object EntityId { get; }
-
         public EntityNotFoundException()
         {
         }
@@ -13,8 +10,6 @@
             ? $"Entity not found. Entity type: {entityType.FullName}"
             : $"Entity not found. Entity type: {entityType.FullName}, id: {entityId}")
         {
-            EntityType = entityType;
-            EntityId = entityId;
         }
     }
 }

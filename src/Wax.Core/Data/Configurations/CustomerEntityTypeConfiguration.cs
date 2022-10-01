@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Wax.Core.Entities.Customers;
+using Wax.Core.Domain.Customers;
 
 namespace Wax.Core.Data.Configurations;
 

@@ -6,7 +6,6 @@ namespace Wax.Core.Services.Customers.Exceptions
     {
         public CustomerNameAlreadyExistsException() : base("Customer with this name already exists.")
         {
-
         }
     }
 }

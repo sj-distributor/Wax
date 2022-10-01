@@ -1,25 +1,37 @@
-﻿using Mediator.Net.Context;
+﻿using AutoMapper;
+using Mediator.Net.Context;
 using Mediator.Net.Contracts;
+using Wax.Core.Domain.Customers;
 using Wax.Core.Services.Customers;
+using Wax.Core.Services.Customers.Exceptions;
 using Wax.Messages.Commands.Customers;
-using Wax.Messages.Events.Customers;
 
 namespace Wax.Core.Handlers.CommandHandlers.Customers
 {
-    public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerCommand>
+    public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerCommand, CreateCustomerResponse>
     {
-        private readonly ICustomerService _customerService;
+        private readonly IMapper _mapper;
+        private readonly ICustomerDataProvider _customerDataProvider;
 
-        public CreateCustomerCommandHandler(ICustomerService customerService)
+        public CreateCustomerCommandHandler(IMapper mapper, ICustomerDataProvider customerDataProvider)
         {
-            _customerService = customerService;
+            _mapper = mapper;
+            _customerDataProvider = customerDataProvider;
         }
 
-        public async Task Handle(IReceiveContext<CreateCustomerCommand> context, CancellationToken cancellationToken)
+        public async Task<CreateCustomerResponse> Handle(IReceiveContext<CreateCustomerCommand> context,
+            CancellationToken cancellationToken)
         {
-            var @event = await _customerService.CreateAsync(context.Message);
+            if (!await _customerDataProvider.CheckIsUniqueNameAsync(context.Message.Name))
+            {
+                throw new CustomerNameAlreadyExistsException();
+            }
 
-            await context.PublishAsync(@event, cancellationToken);
+            var customer = _mapper.Map<Customer>(context.Message);
+
+            await _customerDataProvider.AddAsync(customer).ConfigureAwait(false);
+
+            return new CreateCustomerResponse { CustomerId = customer.Id };
         }
     }
 }
