@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "WilTechs",
+  "classifications": [
+    "architecture",
+    "cqrs",
+    "solution",
+    "template",
+    "solid"
+  ],
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "identity": "Wax",
+  "name": "WilTechs Architecture Solution Template",
+  "shortName": "wax",
+  "sourceName": "Wax",
+  "preferNameDirectory": true
+}
