@@ -11,27 +11,29 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers
     public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerCommand, CreateCustomerResponse>
     {
         private readonly IMapper _mapper;
-        private readonly ICustomerDataProvider _customerDataProvider;
+        private readonly ICustomerChecker _checker;
+        private readonly ICustomerRepository _repository;
 
-        public CreateCustomerCommandHandler(IMapper mapper, ICustomerDataProvider customerDataProvider)
+        public CreateCustomerCommandHandler(IMapper mapper, ICustomerChecker checker, ICustomerRepository repository)
         {
             _mapper = mapper;
-            _customerDataProvider = customerDataProvider;
+            _checker = checker;
+            _repository = repository;
         }
 
         public async Task<CreateCustomerResponse> Handle(IReceiveContext<CreateCustomerCommand> context,
             CancellationToken cancellationToken)
         {
-            if (!await _customerDataProvider.CheckIsUniqueNameAsync(context.Message.Name))
+            if (!await _checker.CheckIsUniqueNameAsync(context.Message.Name))
             {
                 throw new CustomerNameAlreadyExistsException();
             }
 
             var customer = _mapper.Map<Customer>(context.Message);
 
-            await _customerDataProvider.AddAsync(customer).ConfigureAwait(false);
+            await _repository.AddAsync(customer).ConfigureAwait(false);
 
-            return new CreateCustomerResponse { CustomerId = customer.Id };
+            return new CreateCustomerResponse {CustomerId = customer.Id};
         }
     }
 }
