@@ -1,7 +1,6 @@
 using Mediator.Net;
 using Microsoft.AspNetCore.Mvc;
 using Wax.Messages.Commands.Customers;
-using Wax.Messages.Dtos.Customers;
 using Wax.Messages.Requests.Customers;
 
 namespace Wax.Api.Controllers
@@ -18,8 +17,8 @@ namespace Wax.Api.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        [ProducesResponseType(typeof(CustomerShortInfo), 200)]
-        public async Task<IActionResult> GetListAsync(Guid id)
+        [ProducesResponseType(typeof(GetCustomerResponse), 200)]
+        public async Task<IActionResult> GetAsync(Guid id)
         {
             var response = await _mediator.RequestAsync<GetCustomerRequest, GetCustomerResponse>(
                 new GetCustomerRequest { CustomerId = id });
@@ -28,6 +27,7 @@ namespace Wax.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(CreateCustomerResponse), 200)]
         public async Task<IActionResult> CreateAsync([FromBody] CreateCustomerCommand command)
         {
             var response = await _mediator.SendAsync<CreateCustomerCommand, CreateCustomerResponse>(command);
@@ -35,6 +35,7 @@ namespace Wax.Api.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(200)]
         public async Task<IActionResult> UpdateAsync([FromBody] UpdateCustomerCommand command)
         {
             await _mediator.SendAsync(command);

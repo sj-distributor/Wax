@@ -60,7 +60,7 @@ public class CreateCustomerTests
         };
 
         _checker.CheckIsUniqueNameAsync(command.Name).Returns(true);
-        _repository.When(x => x.AddAsync(Arg.Any<Customer>())).Do(_ => callCounter++);
+        _repository.When(x => x.InsertAsync(Arg.Any<Customer>())).Do(_ => callCounter++);
 
         await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None);
         callCounter.ShouldBe(1);

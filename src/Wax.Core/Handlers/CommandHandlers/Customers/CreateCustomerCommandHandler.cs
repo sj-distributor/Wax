@@ -31,7 +31,7 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers
 
             var customer = _mapper.Map<Customer>(context.Message);
 
-            await _repository.AddAsync(customer).ConfigureAwait(false);
+            await _repository.InsertAsync(customer).ConfigureAwait(false);
 
             return new CreateCustomerResponse {CustomerId = customer.Id};
         }

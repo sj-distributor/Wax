@@ -14,7 +14,7 @@ public class EfCoreRepository<TEntity, TKey> : IRepository<TEntity, TKey> where 
     
     public async Task<TEntity> GetByIdAsync(TKey id)
     {
-        var entity = await _dbContext.Set<TEntity>().FindAsync(id);
+        var entity = await _dbContext.Set<TEntity>().FindAsync(id).ConfigureAwait(false);
 
         if (entity == null)
         {
@@ -24,7 +24,7 @@ public class EfCoreRepository<TEntity, TKey> : IRepository<TEntity, TKey> where 
         return entity;
     }
 
-    public async Task<TEntity> AddAsync(TEntity entity)
+    public async Task<TEntity> InsertAsync(TEntity entity)
     {
         await _dbContext.Set<TEntity>().AddAsync(entity).ConfigureAwait(false);
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);

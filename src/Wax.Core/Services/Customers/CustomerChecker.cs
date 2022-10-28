@@ -15,6 +15,6 @@ public class CustomerChecker : ICustomerChecker
     
     public async Task<bool> CheckIsUniqueNameAsync(string name)
     {
-        return !await _dbContext.Set<Customer>().AnyAsync(c => c.Name == name);
+        return !await _dbContext.Set<Customer>().AnyAsync(c => c.Name == name).ConfigureAwait(false);
     }
 }
