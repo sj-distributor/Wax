@@ -1,9 +1,13 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Mediator.Net.Context;
 using NSubstitute;
 using Shouldly;
+using Wax.Core;
+using Wax.Core.Domain;
 using Wax.Core.Domain.Customers;
 using Wax.Core.Handlers.CommandHandlers.Customers;
 using Wax.Core.Profiles;
@@ -16,16 +20,18 @@ namespace Wax.UnitTests.Customers;
 
 public class CreateCustomerTests
 {
-    private readonly ICustomerDataProvider _mockCustomerDataProvider;
+    private readonly ICustomerChecker _checker;
+    private readonly ICustomerRepository _repository;
     private readonly CreateCustomerCommandHandler _handler;
 
     public CreateCustomerTests()
     {
         var mapper = new MapperConfiguration(x => x.AddProfile(new CustomerProfile())).CreateMapper();
 
-        _mockCustomerDataProvider = Substitute.For<ICustomerDataProvider>();
+        _checker = Substitute.For<ICustomerChecker>();
+        _repository = Substitute.For<ICustomerRepository>();
 
-        _handler = new CreateCustomerCommandHandler(mapper, _mockCustomerDataProvider);
+        _handler = new CreateCustomerCommandHandler(mapper, _checker, _repository);
     }
 
     [Fact]
@@ -36,7 +42,7 @@ public class CreateCustomerTests
             Name = "microsoft"
         };
 
-        _mockCustomerDataProvider.CheckIsUniqueNameAsync(command.Name).Returns(false);
+        _checker.CheckIsUniqueNameAsync(command.Name).Returns(false);
 
         await Should.ThrowAsync<CustomerNameAlreadyExistsException>(async () =>
             await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None));
@@ -53,8 +59,8 @@ public class CreateCustomerTests
             Contact = "+861306888888"
         };
 
-        _mockCustomerDataProvider.CheckIsUniqueNameAsync(command.Name).Returns(true);
-        _mockCustomerDataProvider.When(x => x.AddAsync(Arg.Any<Customer>())).Do(_ => callCounter++);
+        _checker.CheckIsUniqueNameAsync(command.Name).Returns(true);
+        _repository.When(x => x.InsertAsync(Arg.Any<Customer>())).Do(_ => callCounter++);
 
         await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None);
         callCounter.ShouldBe(1);
