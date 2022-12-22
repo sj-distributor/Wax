@@ -11,8 +11,8 @@ namespace Wax.IntegrationTests;
 public class TestBaseFixture
 {
     private readonly ILifetimeScope _scope;
-    
-    public TestBaseFixture()
+
+    protected TestBaseFixture()
     {
         var containerBuilder = new ContainerBuilder();
         var logger = Substitute.For<ILogger>();
