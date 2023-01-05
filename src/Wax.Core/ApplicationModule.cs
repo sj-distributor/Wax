@@ -85,8 +85,8 @@ namespace Wax.Core
                 }).AsSelf().As<DbContext>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterGeneric(typeof(EfCoreRepository<,>))
-                .As(typeof(IRepository<,>))
+            builder.RegisterGeneric(typeof(EfCoreRepository<>))
+                .As(typeof(IRepository<>))
                 .InstancePerLifetimeScope();
             
             //TODO: Register all repository

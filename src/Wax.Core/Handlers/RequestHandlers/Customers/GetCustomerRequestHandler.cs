@@ -3,7 +3,6 @@ using AutoMapper.QueryableExtensions;
 using Mediator.Net.Context;
 using Mediator.Net.Contracts;
 using Microsoft.EntityFrameworkCore;
-using Wax.Core.Data;
 using Wax.Core.Domain.Customers;
 using Wax.Messages.Dtos.Customers;
 using Wax.Messages.Requests.Customers;
@@ -13,12 +12,12 @@ namespace Wax.Core.Handlers.RequestHandlers.Customers;
 public class GetCustomerRequestHandler : IRequestHandler<GetCustomerRequest, GetCustomerResponse>
 {
     private readonly IMapper _mapper;
-    private readonly ApplicationDbContext _dbContext;
+    private readonly ICustomerRepository _customerRepository;
 
-    public GetCustomerRequestHandler(IMapper mapper, ApplicationDbContext dbContext)
+    public GetCustomerRequestHandler(IMapper mapper, ICustomerRepository customerRepository)
     {
         _mapper = mapper;
-        _dbContext = dbContext;
+        _customerRepository = customerRepository;
     }
 
     public async Task<GetCustomerResponse> Handle(IReceiveContext<GetCustomerRequest> context,
@@ -26,7 +25,7 @@ public class GetCustomerRequestHandler : IRequestHandler<GetCustomerRequest, Get
     {
         return new GetCustomerResponse
         {
-            Customer = await _dbContext.Set<Customer>()
+            Customer = await _customerRepository.Query.AsNoTracking()
                 .Where(c => c.Id == context.Message.CustomerId)
                 .ProjectTo<CustomerShortInfo>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false)
