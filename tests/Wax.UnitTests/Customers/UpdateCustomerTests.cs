@@ -24,7 +24,7 @@ public class UpdateCustomerTests : CustomerTestFixture
     }
 
     [Fact]
-    public async Task CannotUpdateCustomerWhenNameAlreadyExists()
+    public async Task ShouldNotUpdateCustomerWhenNameAlreadyExists()
     {
         var command = new UpdateCustomerCommand
         {
@@ -42,7 +42,7 @@ public class UpdateCustomerTests : CustomerTestFixture
     }
 
     [Fact]
-    public async Task CanUpdateCustomer()
+    public async Task ShouldUpdateCustomer()
     {
         var customer = new Customer { Id = Guid.NewGuid(), Name = "google" };
 

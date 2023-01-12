@@ -21,7 +21,7 @@ public class CreateCustomerTests : CustomerTestFixture
     }
 
     [Fact]
-    public async Task CannotCreateCustomerWhenNameAlreadyExists()
+    public async Task ShouldNotCreateCustomerWhenNameAlreadyExists()
     {
         var command = new CreateCustomerCommand
         {
@@ -35,7 +35,7 @@ public class CreateCustomerTests : CustomerTestFixture
     }
 
     [Fact]
-    public async Task CanInsertCustomer()
+    public async Task ShouldCallInsert()
     {
         var command = new CreateCustomerCommand
         {

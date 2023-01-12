@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
 using Wax.Core.Domain;
 using Wax.Core.Exceptions;
 
@@ -17,7 +15,8 @@ public class EfCoreRepository<TEntity> : IRepository<TEntity> where TEntity : cl
     public async Task<TEntity> GetByIdAsync<TKey>(TKey id, CancellationToken cancellationToken = default)
         where TKey : notnull
     {
-        var entity = await _dbContext.Set<TEntity>().FindAsync(id, cancellationToken).ConfigureAwait(false);
+        var entity = await _dbContext.Set<TEntity>()
+            .FindAsync(new object?[] { id }, cancellationToken).ConfigureAwait(false);
 
         if (entity == null)
         {
@@ -25,24 +24,6 @@ public class EfCoreRepository<TEntity> : IRepository<TEntity> where TEntity : cl
         }
 
         return entity;
-    }
-
-    public Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate,
-        CancellationToken cancellationToken = default)
-    {
-        return _dbContext.Set<TEntity>().SingleOrDefaultAsync(predicate, cancellationToken);
-    }
-
-    public Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate,
-        CancellationToken cancellationToken = default)
-    {
-        return _dbContext.Set<TEntity>().FirstOrDefaultAsync(predicate, cancellationToken);
-    }
-
-    public Task<List<TEntity>> ToListAsync(Expression<Func<TEntity, bool>> predicate,
-        CancellationToken cancellationToken = default)
-    {
-        return _dbContext.Set<TEntity>().Where(predicate).ToListAsync(cancellationToken);
     }
 
     public async Task<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)

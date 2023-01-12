@@ -22,7 +22,7 @@ public class GetCustomerTests : CustomerTestFixture
     }
 
     [Fact]
-    public async Task CanGetCustomer()
+    public async Task ShouldGetCustomer()
     {
         var customer = new Customer
         {
