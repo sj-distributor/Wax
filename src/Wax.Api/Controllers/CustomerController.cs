@@ -41,5 +41,13 @@ namespace Wax.Api.Controllers
             await _mediator.SendAsync(command);
             return Ok();
         }
+
+        [HttpDelete]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> DeleteAsync([FromBody] DeleteCustomerCommand command)
+        {
+            await _mediator.SendAsync(command);
+            return Ok();
+        }
     }
 }
