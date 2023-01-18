@@ -13,6 +13,10 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup version from tag
         run: echo "VERSION=${GITHUB_REF/refs\/tags\/}" >> $GITHUB_ENV
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.0.x'
 
       - uses: nuget/setup-nuget@v1
         with:
