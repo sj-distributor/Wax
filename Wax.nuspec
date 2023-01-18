@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+
+    <id>Wax.Template</id>
+    <version>0.2.0</version>
+    <title>WilTechs Architecture Solution Template</title>
+    <authors>WilTechs</authors>
+    <description>WilTechs Architecture Solution Template for and .NET 6.</description>
+    <releaseNotes>Update packages</releaseNotes>
+    <projectUrl>https://github.com/sj-distributor/Wax</projectUrl>
+    <repository type="git" url="https://github.com/sj-distributor/Wax.git" branch="main" />
+    <license type="expression">MIT</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>architecture cqrs solution template solid</tags>
+    <readme>README.md</readme>
+
+    <packageTypes>
+      <packageType name="Template" />
+    </packageTypes>
+
+  </metadata>
+
+  <files>
+    <file src="README.md" />
+    <file src=".\**" target="content" exclude="**\bin\**;**\obj\**;**\.git\**;**\.github\**;**\*.user;**\.vs\**;**\.vscode\**;**\.gitignore;**\.idea\**" />
+  </files>
+
+</package>

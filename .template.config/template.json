@@ -12,7 +12,7 @@
     "language": "C#",
     "type": "project"
   },
-  "identity": "Wax",
+  "identity": "Wax.Template",
   "name": "WilTechs Architecture Solution Template",
   "shortName": "wax",
   "sourceName": "Wax",
