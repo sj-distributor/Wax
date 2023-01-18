@@ -4,11 +4,13 @@ on:
   push:
     tags:
       - '*.*.*'
+    paths:
+      - 'Wax.nuspec'
 
 jobs:
   publish:
     name: Publish to nuget
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Setup version from tag
