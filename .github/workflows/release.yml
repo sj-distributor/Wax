@@ -1,23 +1,25 @@
 name: Release
+
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'Wax.nuspec'
+    tags:
+      - '*.*.*'
+
 jobs:
   publish:
     name: Publish to nuget
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Setup version from tag
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\/}" >> $GITHUB_ENV
 
       - uses: nuget/setup-nuget@v1
         with:
           nuget-version: '6.x'
 
       - name: Package the template
-        run: nuget pack Wax.nuspec -NoDefaultExcludes
+        run: nuget pack Wax.nuspec -NoDefaultExcludes -Version ${VERSION}
 
-      - name: Push to nuget.org
+      - name: Publish to nuget.org
         run: nuget push *.nupkg -src https://api.nuget.org/v3/index.json ${{secrets.NUGET_API_KEY}} -SkipDuplicate
