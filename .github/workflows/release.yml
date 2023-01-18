@@ -1,0 +1,23 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Wax.nuspec'
+jobs:
+  publish:
+    name: Publish to nuget
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: nuget/setup-nuget@v1
+        with:
+          nuget-version: '6.x'
+
+      - name: Package the template
+        run: nuget pack Wax.nuspec -NoDefaultExcludes
+
+      - name: Push to nuget.org
+        run: nuget push *.nupkg -src https://api.nuget.org/v3/index.json ${{secrets.NUGET_API_KEY}} -SkipDuplicate
