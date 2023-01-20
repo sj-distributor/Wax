@@ -3,14 +3,14 @@ using Mediator.Net.Context;
 using Mediator.Net.Contracts;
 using Mediator.Net.Pipeline;
 
-namespace Wax.Core.Processing.FluentMessageValidator;
+namespace Wax.Core.Middlewares.FluentMessageValidator;
 
-public class MessageValidatorMiddlewareSpecification<TContext> : IPipeSpecification<TContext>
+public class MessageValidatorSpecification<TContext> : IPipeSpecification<TContext>
     where TContext : IContext<IMessage>
 {
     private readonly IEnumerable<IFluentMessageValidator> _messageValidators;
 
-    public MessageValidatorMiddlewareSpecification(IEnumerable<IFluentMessageValidator> messageValidators)
+    public MessageValidatorSpecification(IEnumerable<IFluentMessageValidator> messageValidators)
     {
         _messageValidators = messageValidators;
     }

@@ -1,13 +1,14 @@
-﻿namespace Wax.Core.Exceptions
+﻿using Wax.Messages.Enums;
+
+namespace Wax.Core.Exceptions
 {
     public class BusinessException : Exception
     {
-        public BusinessException()
+        protected BusinessException(ErrorCode errorCode, string message) : base(message)
         {
+            ErrorCode = errorCode;
         }
 
-        public BusinessException(string message) : base(message)
-        {
-        }
+        public ErrorCode ErrorCode { get; }
     }
 }

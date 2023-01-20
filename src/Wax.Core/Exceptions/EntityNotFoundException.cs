@@ -1,14 +1,11 @@
 ﻿namespace Wax.Core.Exceptions
 {
-    public class EntityNotFoundException : Exception
+    public class EntityNotFoundException : BusinessException
     {
-        public EntityNotFoundException()
-        {
-        }
-
-        public EntityNotFoundException(Type entityType, object entityId = null) : base(entityId == null
-            ? $"Entity not found. Entity type: {entityType.FullName}"
-            : $"Entity not found. Entity type: {entityType.FullName}, id: {entityId}")
+        public EntityNotFoundException(Type entityType, object entityId = null) : base(
+            Messages.Enums.ErrorCode.NotFound, entityId == null
+                ? $"Entity not found. Entity type: {entityType.FullName}"
+                : $"Entity not found. Entity type: {entityType.FullName}, id: {entityId}")
         {
         }
     }

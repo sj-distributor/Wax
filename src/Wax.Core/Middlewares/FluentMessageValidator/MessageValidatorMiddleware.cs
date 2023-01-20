@@ -3,7 +3,7 @@ using Mediator.Net.Context;
 using Mediator.Net.Contracts;
 using Mediator.Net.Pipeline;
 
-namespace Wax.Core.Processing.FluentMessageValidator;
+namespace Wax.Core.Middlewares.FluentMessageValidator;
 
 public static class MessageValidatorMiddleware
 {
@@ -19,6 +19,6 @@ public static class MessageValidatorMiddleware
 
         messageValidators ??= configurator.DependencyScope.Resolve<IEnumerable<IFluentMessageValidator>>();
 
-        configurator.AddPipeSpecification(new MessageValidatorMiddlewareSpecification<TContext>(messageValidators));
+        configurator.AddPipeSpecification(new MessageValidatorSpecification<TContext>(messageValidators));
     }
 }

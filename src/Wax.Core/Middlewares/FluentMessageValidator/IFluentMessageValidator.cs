@@ -2,7 +2,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Mediator.Net.Contracts;
 
-namespace Wax.Core.Processing.FluentMessageValidator;
+namespace Wax.Core.Middlewares.FluentMessageValidator;
 
 public interface IFluentMessageValidator
 {

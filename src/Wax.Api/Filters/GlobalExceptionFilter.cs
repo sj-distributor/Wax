@@ -18,12 +18,14 @@ public class GlobalExceptionFilter : IExceptionFilter
     {
         switch (context.Exception)
         {
-            case BusinessException:
-                HandleBusinessException(context);
-                break;
             case EntityNotFoundException:
                 HandleEntityNotFoundException(context);
                 break;
+            
+            case BusinessException:
+                HandleBusinessException(context);
+                break;
+
             case FluentValidation.ValidationException:
                 HandleValidationException(context);
                 break;
