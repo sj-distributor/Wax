@@ -9,11 +9,12 @@ using Wax.Messages.Enums;
 
 namespace Wax.Core.Middlewares;
 
-public class GlobalExceptionResponseSpecification<TContext> : IPipeSpecification<TContext> where TContext : IContext<IMessage>
+public class ExceptionUniformResponseSpecification<TContext> : IPipeSpecification<TContext>
+    where TContext : IContext<IMessage>
 {
     private readonly ILogger _logger;
 
-    public GlobalExceptionResponseSpecification(ILogger logger)
+    public ExceptionUniformResponseSpecification(ILogger logger)
     {
         _logger = logger;
     }
@@ -45,19 +46,20 @@ public class GlobalExceptionResponseSpecification<TContext> : IPipeSpecification
             case BusinessException businessException:
                 _logger.Warning(ex.Message);
                 context.Result = UniformResponse.Failure(businessException.ErrorCode, businessException.Message);
-                
+
                 return Task.CompletedTask;
-            
+
             case ValidationException validationException:
                 _logger.Warning(string.Join(';', validationException.Errors.Select(e => e.ErrorMessage)));
-                context.Result = UniformResponse.Failure(ErrorCode.NotFound, validationException.Message);
-                
+                context.Result = UniformResponse.Failure(ErrorCode.BadRequest, validationException.Message);
+
                 return Task.CompletedTask;
         }
 
         _logger.Error(ex.Message);
-        context.Result = UniformResponse.Failure(ErrorCode.Undefined, "An error occur.Try it again later.");
         
+        context.Result = UniformResponse.Failure(ErrorCode.Undefined, "An error occur. Try it again later.");
+
         return Task.CompletedTask;
     }
 }

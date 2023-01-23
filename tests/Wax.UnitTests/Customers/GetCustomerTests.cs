@@ -40,9 +40,9 @@ public class GetCustomerTests : CustomerTestFixture
                 CustomerId = customer.Id
             }), CancellationToken.None);
 
-        response.Customer.ShouldNotBeNull();
-        response.Customer.Id.ShouldBe(customer.Id);
-        response.Customer.Name.ShouldBe(customer.Name);
-        response.Customer.Address.ShouldBe(customer.Address);
+        response.Data.ShouldNotBeNull();
+        response.Data.Id.ShouldBe(customer.Id);
+        response.Data.Name.ShouldBe(customer.Name);
+        response.Data.Address.ShouldBe(customer.Address);
     }
 }

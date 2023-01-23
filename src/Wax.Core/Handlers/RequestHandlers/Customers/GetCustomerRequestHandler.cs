@@ -4,12 +4,13 @@ using Mediator.Net.Context;
 using Mediator.Net.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Wax.Core.Domain.Customers;
+using Wax.Messages;
 using Wax.Messages.Dtos.Customers;
 using Wax.Messages.Requests.Customers;
 
 namespace Wax.Core.Handlers.RequestHandlers.Customers;
 
-public class GetCustomerRequestHandler : IRequestHandler<GetCustomerRequest, GetCustomerResponse>
+public class GetCustomerRequestHandler : IRequestHandler<GetCustomerRequest, IUniformResponse<CustomerShortInfo>>
 {
     private readonly IMapper _mapper;
     private readonly ICustomerRepository _customerRepository;
@@ -20,15 +21,14 @@ public class GetCustomerRequestHandler : IRequestHandler<GetCustomerRequest, Get
         _customerRepository = customerRepository;
     }
 
-    public async Task<GetCustomerResponse> Handle(IReceiveContext<GetCustomerRequest> context,
+    public async Task<IUniformResponse<CustomerShortInfo>> Handle(IReceiveContext<GetCustomerRequest> context,
         CancellationToken cancellationToken)
     {
-        return new GetCustomerResponse
-        {
-            Customer = await _customerRepository.Query.AsNoTracking()
-                .Where(c => c.Id == context.Message.CustomerId)
-                .ProjectTo<CustomerShortInfo>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false)
-        };
+        var customer = await _customerRepository.Query.AsNoTracking()
+            .Where(c => c.Id == context.Message.CustomerId)
+            .ProjectTo<CustomerShortInfo>(_mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+
+        return UniformResponse<CustomerShortInfo>.Succeed(customer);
     }
 }

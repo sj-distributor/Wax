@@ -3,11 +3,12 @@ using Mediator.Net.Context;
 using Mediator.Net.Contracts;
 using Wax.Core.Domain.Customers;
 using Wax.Core.Domain.Customers.Exceptions;
+using Wax.Messages;
 using Wax.Messages.Commands.Customers;
 
 namespace Wax.Core.Handlers.CommandHandlers.Customers
 {
-    public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerCommand, CreateCustomerResponse>
+    public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerCommand, IUniformResponse<Guid>>
     {
         private readonly IMapper _mapper;
         private readonly ICustomerRepository _repository;
@@ -18,7 +19,7 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers
             _repository = repository;
         }
 
-        public async Task<CreateCustomerResponse> Handle(IReceiveContext<CreateCustomerCommand> context,
+        public async Task<IUniformResponse<Guid>> Handle(IReceiveContext<CreateCustomerCommand> context,
             CancellationToken cancellationToken)
         {
             if (!await _repository.CheckIsUniqueNameAsync(context.Message.Name, cancellationToken)
@@ -31,7 +32,7 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers
 
             await _repository.InsertAsync(customer, cancellationToken).ConfigureAwait(false);
 
-            return new CreateCustomerResponse { CustomerId = customer.Id };
+            return UniformResponse<Guid>.Succeed(customer.Id);
         }
     }
 }

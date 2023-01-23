@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using Mediator.Net;
 using Shouldly;
+using Wax.Messages;
 using Wax.Messages.Commands.Customers;
+using Wax.Messages.Dtos.Customers;
 using Wax.Messages.Requests.Customers;
 using Xunit;
 
@@ -22,17 +24,18 @@ public class CustomerTests : TestBaseFixture
                 Contact = "(800) 426-9400"
             };
 
-            var createCustomerResponse = await mediator.SendAsync<CreateCustomerCommand, CreateCustomerResponse>(
+            var createCustomerResponse = await mediator.SendAsync<CreateCustomerCommand, IUniformResponse<Guid>>(
                 createCustomerCommand);
 
-            var getCustomerResponse = await mediator.RequestAsync<GetCustomerRequest, GetCustomerResponse>(
-                new GetCustomerRequest
-                {
-                    CustomerId = createCustomerResponse.CustomerId
-                });
+            var getCustomerResponse =
+                await mediator.RequestAsync<GetCustomerRequest, IUniformResponse<CustomerShortInfo>>(
+                    new GetCustomerRequest
+                    {
+                        CustomerId = createCustomerResponse.Data
+                    });
 
-            getCustomerResponse.Customer.Name.ShouldBe(createCustomerCommand.Name);
-            getCustomerResponse.Customer.Address.ShouldBe(createCustomerCommand.Address);
+            getCustomerResponse.Data.Name.ShouldBe(createCustomerCommand.Name);
+            getCustomerResponse.Data.Address.ShouldBe(createCustomerCommand.Address);
         });
     }
 
@@ -53,14 +56,14 @@ public class CustomerTests : TestBaseFixture
 
             await mediator.SendAsync(updateCustomerCommand);
 
-            var getCustomerResponse = await mediator.RequestAsync<GetCustomerRequest, GetCustomerResponse>(
+            var getCustomerResponse = await mediator.RequestAsync<GetCustomerRequest, IUniformResponse<CustomerShortInfo>>(
                 new GetCustomerRequest
                 {
                     CustomerId = updateCustomerCommand.CustomerId
                 });
 
-            getCustomerResponse.Customer.Name.ShouldBe(updateCustomerCommand.Name);
-            getCustomerResponse.Customer.Address.ShouldBe(updateCustomerCommand.Address);
+            getCustomerResponse.Data.Name.ShouldBe(updateCustomerCommand.Name);
+            getCustomerResponse.Data.Address.ShouldBe(updateCustomerCommand.Address);
         });
     }
 
@@ -68,7 +71,7 @@ public class CustomerTests : TestBaseFixture
     public async Task ShouldDeleteCustomer()
     {
         var customerId = await CreateDefaultCustomer();
-        
+
         await Run<IMediator>(async mediator =>
         {
             await mediator.SendAsync(new DeleteCustomerCommand
@@ -76,13 +79,13 @@ public class CustomerTests : TestBaseFixture
                 CustomerId = customerId
             });
 
-            var getCustomerResponse = await mediator.RequestAsync<GetCustomerRequest, GetCustomerResponse>(
+            var getCustomerResponse = await mediator.RequestAsync<GetCustomerRequest, IUniformResponse<CustomerShortInfo>>(
                 new GetCustomerRequest
                 {
                     CustomerId = customerId
                 });
 
-            getCustomerResponse.Customer.ShouldBeNull();
+            getCustomerResponse.Data.ShouldBeNull();
         });
     }
 
@@ -90,7 +93,7 @@ public class CustomerTests : TestBaseFixture
     {
         return await Run<IMediator, Guid>(async mediator =>
         {
-            var createCustomerResponse = await mediator.SendAsync<CreateCustomerCommand, CreateCustomerResponse>(
+            var createCustomerResponse = await mediator.SendAsync<CreateCustomerCommand, IUniformResponse<Guid>>(
                 new CreateCustomerCommand
                 {
                     Name = "Microsoft",
@@ -98,7 +101,7 @@ public class CustomerTests : TestBaseFixture
                     Contact = "(800) 426-9400"
                 });
 
-            return createCustomerResponse.CustomerId;
+            return createCustomerResponse.Data;
         });
     }
 }

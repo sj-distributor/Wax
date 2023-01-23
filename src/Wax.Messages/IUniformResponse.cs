@@ -38,7 +38,7 @@ public class UniformResponse : IUniformResponse
 
 public class UniformResponse<T> : UniformResponse, IUniformResponse<T>
 {
-    protected UniformResponse(bool success, ErrorReason error, T data) : base(success, error)
+    private UniformResponse(bool success, ErrorReason error, T data) : base(success, error)
     {
         Data = data;
     }

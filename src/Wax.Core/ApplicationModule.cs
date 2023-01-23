@@ -114,8 +114,8 @@ namespace Wax.Core
             mediatorBuilder.ConfigureGlobalReceivePipe(c =>
             {
                 c.UseSerilog(logger: _logger);
+                c.UseExceptionUniformResponse();
                 c.UseMessageValidator();
-                c.UseGlobalExceptionResponse();
             });
 
             builder.RegisterMediator(mediatorBuilder);

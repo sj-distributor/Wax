@@ -7,8 +7,3 @@ public class GetCustomerRequest : IRequest
 {
     public Guid CustomerId { get; set; }
 }
-
-public class GetCustomerResponse : IResponse
-{
-    public CustomerShortInfo Customer { get; set; }
-}

@@ -45,7 +45,6 @@ public class MessageValidatorSpecification<TContext> : IPipeSpecification<TConte
 
     public Task OnException(Exception ex, TContext context)
     {
-        ExceptionDispatchInfo.Capture(ex).Throw();
         throw ex;
     }
 }

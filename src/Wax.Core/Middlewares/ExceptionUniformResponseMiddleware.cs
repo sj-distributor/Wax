@@ -6,9 +6,9 @@ using Serilog;
 
 namespace Wax.Core.Middlewares;
 
-public static class GlobalExceptionResponseMiddleware
+public static class ExceptionUniformResponseMiddleware
 {
-    public static void UseGlobalExceptionResponse<TContext>(this IPipeConfigurator<TContext> configurator,
+    public static void UseExceptionUniformResponse<TContext>(this IPipeConfigurator<TContext> configurator,
         ILogger logger = null)
         where TContext : IContext<IMessage>
     {
@@ -20,6 +20,6 @@ public static class GlobalExceptionResponseMiddleware
 
         logger ??= configurator.DependencyScope.Resolve<ILogger>();
 
-        configurator.AddPipeSpecification(new GlobalExceptionResponseSpecification<TContext>(logger));
+        configurator.AddPipeSpecification(new ExceptionUniformResponseSpecification<TContext>(logger));
     }
 }
