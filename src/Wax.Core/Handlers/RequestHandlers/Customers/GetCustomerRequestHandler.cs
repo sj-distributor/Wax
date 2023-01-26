@@ -10,7 +10,7 @@ using Wax.Messages.Requests.Customers;
 
 namespace Wax.Core.Handlers.RequestHandlers.Customers;
 
-public class GetCustomerRequestHandler : IRequestHandler<GetCustomerRequest, IUniformResponse<CustomerShortInfo>>
+public class GetCustomerRequestHandler : IRequestHandler<GetCustomerRequest, UniformResponse<CustomerShortInfo>>
 {
     private readonly IMapper _mapper;
     private readonly ICustomerRepository _customerRepository;
@@ -21,7 +21,7 @@ public class GetCustomerRequestHandler : IRequestHandler<GetCustomerRequest, IUn
         _customerRepository = customerRepository;
     }
 
-    public async Task<IUniformResponse<CustomerShortInfo>> Handle(IReceiveContext<GetCustomerRequest> context,
+    public async Task<UniformResponse<CustomerShortInfo>> Handle(IReceiveContext<GetCustomerRequest> context,
         CancellationToken cancellationToken)
     {
         var customer = await _customerRepository.Query.AsNoTracking()

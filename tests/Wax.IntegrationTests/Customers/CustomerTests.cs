@@ -24,11 +24,11 @@ public class CustomerTests : TestBaseFixture
                 Contact = "(800) 426-9400"
             };
 
-            var createCustomerResponse = await mediator.SendAsync<CreateCustomerCommand, IUniformResponse<Guid>>(
+            var createCustomerResponse = await mediator.SendAsync<CreateCustomerCommand, UniformResponse<Guid>>(
                 createCustomerCommand);
 
             var getCustomerResponse =
-                await mediator.RequestAsync<GetCustomerRequest, IUniformResponse<CustomerShortInfo>>(
+                await mediator.RequestAsync<GetCustomerRequest, UniformResponse<CustomerShortInfo>>(
                     new GetCustomerRequest
                     {
                         CustomerId = createCustomerResponse.Data
@@ -56,7 +56,7 @@ public class CustomerTests : TestBaseFixture
 
             await mediator.SendAsync(updateCustomerCommand);
 
-            var getCustomerResponse = await mediator.RequestAsync<GetCustomerRequest, IUniformResponse<CustomerShortInfo>>(
+            var getCustomerResponse = await mediator.RequestAsync<GetCustomerRequest, UniformResponse<CustomerShortInfo>>(
                 new GetCustomerRequest
                 {
                     CustomerId = updateCustomerCommand.CustomerId
@@ -79,7 +79,7 @@ public class CustomerTests : TestBaseFixture
                 CustomerId = customerId
             });
 
-            var getCustomerResponse = await mediator.RequestAsync<GetCustomerRequest, IUniformResponse<CustomerShortInfo>>(
+            var getCustomerResponse = await mediator.RequestAsync<GetCustomerRequest, UniformResponse<CustomerShortInfo>>(
                 new GetCustomerRequest
                 {
                     CustomerId = customerId
@@ -93,7 +93,7 @@ public class CustomerTests : TestBaseFixture
     {
         return await Run<IMediator, Guid>(async mediator =>
         {
-            var createCustomerResponse = await mediator.SendAsync<CreateCustomerCommand, IUniformResponse<Guid>>(
+            var createCustomerResponse = await mediator.SendAsync<CreateCustomerCommand, UniformResponse<Guid>>(
                 new CreateCustomerCommand
                 {
                     Name = "Microsoft",

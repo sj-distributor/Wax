@@ -8,7 +8,7 @@ using Wax.Messages.Commands.Customers;
 
 namespace Wax.Core.Handlers.CommandHandlers.Customers;
 
-public class UpdateCustomerCommandHandler : ICommandHandler<UpdateCustomerCommand, IUniformResponse>
+public class UpdateCustomerCommandHandler : ICommandHandler<UpdateCustomerCommand, UniformResponse>
 {
     private readonly IMapper _mapper;
     private readonly ICustomerRepository _repository;
@@ -19,7 +19,7 @@ public class UpdateCustomerCommandHandler : ICommandHandler<UpdateCustomerComman
         _repository = repository;
     }
 
-    public async Task<IUniformResponse> Handle(IReceiveContext<UpdateCustomerCommand> context,
+    public async Task<UniformResponse> Handle(IReceiveContext<UpdateCustomerCommand> context,
         CancellationToken cancellationToken)
     {
         var customer = await _repository.GetByIdAsync(context.Message.CustomerId, cancellationToken)

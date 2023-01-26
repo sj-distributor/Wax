@@ -19,36 +19,36 @@ namespace Wax.Api.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        [ProducesResponseType(typeof(IUniformResponse<CustomerShortInfo>), 200)]
+        [ProducesResponseType(typeof(UniformResponse<CustomerShortInfo>), 200)]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var response = await _mediator.RequestAsync<GetCustomerRequest, IUniformResponse<CustomerShortInfo>>(
+            var response = await _mediator.RequestAsync<GetCustomerRequest, UniformResponse<CustomerShortInfo>>(
                 new GetCustomerRequest {CustomerId = id});
 
             return Ok(response);
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(IUniformResponse<Guid>), 200)]
+        [ProducesResponseType(typeof(UniformResponse<Guid>), 200)]
         public async Task<IActionResult> CreateAsync([FromBody] CreateCustomerCommand command)
         {
-            var response = await _mediator.SendAsync<CreateCustomerCommand, IUniformResponse<Guid>>(command);
+            var response = await _mediator.SendAsync<CreateCustomerCommand, UniformResponse<Guid>>(command);
             return Ok(response);
         }
 
         [HttpPut]
-        [ProducesResponseType(typeof(IUniformResponse), 200)]
+        [ProducesResponseType(typeof(UniformResponse), 200)]
         public async Task<IActionResult> UpdateAsync([FromBody] UpdateCustomerCommand command)
         {
-            await _mediator.SendAsync<UpdateCustomerCommand, IUniformResponse>(command);
+            await _mediator.SendAsync<UpdateCustomerCommand, UniformResponse>(command);
             return Ok();
         }
 
         [HttpDelete]
-        [ProducesResponseType(typeof(IUniformResponse), 200)]
+        [ProducesResponseType(typeof(UniformResponse), 200)]
         public async Task<IActionResult> DeleteAsync([FromBody] DeleteCustomerCommand command)
         {
-            await _mediator.SendAsync<DeleteCustomerCommand, IUniformResponse>(command);
+            await _mediator.SendAsync<DeleteCustomerCommand, UniformResponse>(command);
             return Ok();
         }
     }

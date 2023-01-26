@@ -11,7 +11,7 @@ using Wax.Core.Data.Repositories;
 using Wax.Core.DependencyInjection;
 using Wax.Core.Domain;
 using Wax.Core.Domain.Customers;
-using Wax.Core.Middlewares;
+using Wax.Core.Middlewares.ExceptionUniformResponse;
 using Wax.Core.Middlewares.FluentMessageValidator;
 using Wax.Core.Services.Identity;
 using Module = Autofac.Module;

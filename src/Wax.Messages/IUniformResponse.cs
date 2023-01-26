@@ -16,10 +16,8 @@ public interface IUniformResponse<T> : IUniformResponse
 
 public class UniformResponse : IUniformResponse
 {
-    protected UniformResponse(bool success, ErrorReason error)
+    protected UniformResponse()
     {
-        Success = success;
-        Error = error;
     }
 
     public bool Success { get; set; }
@@ -27,27 +25,39 @@ public class UniformResponse : IUniformResponse
 
     public static UniformResponse Succeed()
     {
-        return new UniformResponse(true, null);
+        return new UniformResponse
+        {
+            Success = true,
+            Error = null
+        };
     }
 
     public static UniformResponse Failure(ErrorCode code, string message)
     {
-        return new UniformResponse(false, new ErrorReason(code,message));
+        return new UniformResponse
+        {
+            Success = false,
+            Error = new ErrorReason(code, message)
+        };
     }
 }
 
 public class UniformResponse<T> : UniformResponse, IUniformResponse<T>
 {
-    private UniformResponse(bool success, ErrorReason error, T data) : base(success, error)
+    private UniformResponse()
     {
-        Data = data;
     }
 
     public T Data { get; set; }
 
     public static UniformResponse<T> Succeed(T data)
     {
-        return new UniformResponse<T>(true, null, data);
+        return new UniformResponse<T>
+        {
+            Success = true,
+            Data = data,
+            Error = null
+        };
     }
 }
 

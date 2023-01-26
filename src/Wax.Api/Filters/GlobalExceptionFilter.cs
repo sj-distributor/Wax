@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Wax.Core.Exceptions;
 
 namespace Wax.Api.Filters;
 
@@ -18,14 +17,6 @@ public class GlobalExceptionFilter : IExceptionFilter
     {
         switch (context.Exception)
         {
-            case EntityNotFoundException:
-                HandleEntityNotFoundException(context);
-                break;
-            
-            case BusinessException:
-                HandleBusinessException(context);
-                break;
-
             case FluentValidation.ValidationException:
                 HandleValidationException(context);
                 break;
@@ -48,10 +39,10 @@ public class GlobalExceptionFilter : IExceptionFilter
             Detail = "Please refer to the errors property for additional details."
         };
 
-        problemDetails.Errors.Add("BusinessValidations", new string[] { context.Exception.Message });
+        problemDetails.Errors.Add("BusinessValidations", new string[] {context.Exception.Message});
 
         context.Result = new BadRequestObjectResult(problemDetails);
-        context.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+        context.HttpContext.Response.StatusCode = (int) HttpStatusCode.BadRequest;
     }
 
     private void HandleInternalServerError(ExceptionContext context)
@@ -66,22 +57,6 @@ public class GlobalExceptionFilter : IExceptionFilter
         };
 
         context.Result = new ObjectResult(problemDetails);
-    }
-
-    private void HandleEntityNotFoundException(ExceptionContext context)
-    {
-        _logger.Warning(context.Exception.Message);
-
-        var exception = (EntityNotFoundException)context.Exception;
-
-        var details = new ProblemDetails
-        {
-            Status = StatusCodes.Status404NotFound,
-            Title = "The specified resource was not found.",
-            Detail = exception.Message
-        };
-
-        context.Result = new NotFoundObjectResult(details);
     }
 
     private void HandleValidationException(ExceptionContext context)

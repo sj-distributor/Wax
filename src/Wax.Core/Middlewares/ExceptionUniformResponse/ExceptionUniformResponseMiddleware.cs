@@ -4,7 +4,7 @@ using Mediator.Net.Contracts;
 using Mediator.Net.Pipeline;
 using Serilog;
 
-namespace Wax.Core.Middlewares;
+namespace Wax.Core.Middlewares.ExceptionUniformResponse;
 
 public static class ExceptionUniformResponseMiddleware
 {

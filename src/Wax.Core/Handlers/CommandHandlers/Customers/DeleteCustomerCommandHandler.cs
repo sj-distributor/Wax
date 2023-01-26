@@ -6,7 +6,7 @@ using Wax.Messages.Commands.Customers;
 
 namespace Wax.Core.Handlers.CommandHandlers.Customers;
 
-public class DeleteCustomerCommandHandler: ICommandHandler<DeleteCustomerCommand,IUniformResponse>
+public class DeleteCustomerCommandHandler : ICommandHandler<DeleteCustomerCommand, UniformResponse>
 {
     private readonly ICustomerRepository _customerRepository;
 
@@ -14,13 +14,14 @@ public class DeleteCustomerCommandHandler: ICommandHandler<DeleteCustomerCommand
     {
         _customerRepository = customerRepository;
     }
-    
-    public async Task<IUniformResponse> Handle(IReceiveContext<DeleteCustomerCommand> context, CancellationToken cancellationToken)
+
+    public async Task<UniformResponse> Handle(IReceiveContext<DeleteCustomerCommand> context,
+        CancellationToken cancellationToken)
     {
         var customer = await _customerRepository.GetByIdAsync(context.Message.CustomerId, cancellationToken);
 
         await _customerRepository.DeleteAsync(customer, cancellationToken);
-        
+
         return UniformResponse.Succeed();
     }
 }

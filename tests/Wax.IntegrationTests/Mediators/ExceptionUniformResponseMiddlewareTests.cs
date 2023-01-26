@@ -20,7 +20,7 @@ public class ExceptionUniformResponseMiddlewareTests : TestBaseFixture
     {
         await Run<IMediator>(async mediator =>
         {
-            var response = await mediator.SendAsync<UpdateCustomerCommand, IUniformResponse>(
+            var response = await mediator.SendAsync<UpdateCustomerCommand, UniformResponse>(
                 new UpdateCustomerCommand
                 {
                     CustomerId = Guid.NewGuid(),
@@ -37,7 +37,7 @@ public class ExceptionUniformResponseMiddlewareTests : TestBaseFixture
     {
         await Run<IMediator>(async mediator =>
         {
-            var response = await mediator.SendAsync<UpdateCustomerCommand, IUniformResponse>(
+            var response = await mediator.SendAsync<UpdateCustomerCommand, UniformResponse>(
                 new UpdateCustomerCommand
                 {
                     CustomerId = Guid.NewGuid(),
@@ -54,7 +54,7 @@ public class ExceptionUniformResponseMiddlewareTests : TestBaseFixture
     {
         await Run<IMediator>(async mediator =>
         {
-            var response = await mediator.SendAsync<UpdateCustomerCommand, IUniformResponse>(
+            var response = await mediator.SendAsync<UpdateCustomerCommand, UniformResponse>(
                 new UpdateCustomerCommand
                 {
                     CustomerId = Guid.NewGuid(),
@@ -63,6 +63,7 @@ public class ExceptionUniformResponseMiddlewareTests : TestBaseFixture
 
             response.Success.ShouldBeFalse();
             response.Error.Code.ShouldBe(ErrorCode.Undefined);
+            response.Error.Message.ShouldBe("An error occur. Try it again later.");
         }, builder =>
         {
             var repository = Substitute.For<ICustomerRepository>();
