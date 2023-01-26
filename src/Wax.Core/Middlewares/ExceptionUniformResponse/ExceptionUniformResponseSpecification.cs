@@ -69,7 +69,7 @@ public class ExceptionUniformResponseSpecification<TContext> : IPipeSpecificatio
         }
         else
         {
-            throw new NotUniformResponseException();
+            throw new NotUniformResponseException(ex);
         }
     }
 }
