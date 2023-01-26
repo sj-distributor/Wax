@@ -40,16 +40,16 @@ namespace Wax.Api.Controllers
         [ProducesResponseType(typeof(UniformResponse), 200)]
         public async Task<IActionResult> UpdateAsync([FromBody] UpdateCustomerCommand command)
         {
-            await _mediator.SendAsync<UpdateCustomerCommand, UniformResponse>(command);
-            return Ok();
+            var response = await _mediator.SendAsync<UpdateCustomerCommand, UniformResponse>(command);
+            return Ok(response);
         }
 
         [HttpDelete]
         [ProducesResponseType(typeof(UniformResponse), 200)]
         public async Task<IActionResult> DeleteAsync([FromBody] DeleteCustomerCommand command)
         {
-            await _mediator.SendAsync<DeleteCustomerCommand, UniformResponse>(command);
-            return Ok();
+            var response = await _mediator.SendAsync<DeleteCustomerCommand, UniformResponse>(command);
+            return Ok(response);
         }
     }
 }
