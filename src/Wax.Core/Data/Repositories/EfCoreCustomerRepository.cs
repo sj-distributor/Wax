@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Wax.Core.DependencyInjection;
 using Wax.Core.Domain.Customers;
 
 namespace Wax.Core.Data.Repositories;
 
-public class EfCoreCustomerRepository : EfCoreRepository<Customer>, ICustomerRepository
+public class EfCoreCustomerRepository : EfCoreRepository<Customer>, ICustomerRepository, IScopedDependency
 {
     private readonly DbSet<Customer> _customers;
 
