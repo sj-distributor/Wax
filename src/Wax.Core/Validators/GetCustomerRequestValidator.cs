@@ -1,5 +1,5 @@
 using FluentValidation;
-using Wax.Core.Processing.FluentMessageValidator;
+using Wax.Core.Middlewares.FluentMessageValidator;
 using Wax.Messages.Requests.Customers;
 
 namespace Wax.Core.Validators;

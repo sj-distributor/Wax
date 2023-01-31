@@ -11,7 +11,8 @@ using Wax.Core.Data.Repositories;
 using Wax.Core.DependencyInjection;
 using Wax.Core.Domain;
 using Wax.Core.Domain.Customers;
-using Wax.Core.Processing.FluentMessageValidator;
+using Wax.Core.Middlewares.FluentMessageValidator;
+using Wax.Core.Middlewares.Logging;
 using Wax.Core.Services.Identity;
 using Module = Autofac.Module;
 
@@ -112,7 +113,7 @@ namespace Wax.Core
             mediatorBuilder.RegisterHandlers(_assemblies);
             mediatorBuilder.ConfigureGlobalReceivePipe(c =>
             {
-                c.UseSerilog(logger: _logger);
+                c.UseLogger();
                 c.UseMessageValidator();
             });
 

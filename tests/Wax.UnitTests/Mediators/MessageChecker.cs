@@ -2,7 +2,8 @@ using System.Linq;
 using Mediator.Net.Contracts;
 using Shouldly;
 using Wax.Core;
-using Wax.Core.Processing.FluentMessageValidator;
+using Wax.Core.Extensions;
+using Wax.Core.Middlewares.FluentMessageValidator;
 using Wax.Messages.Commands.Customers;
 using Xunit;
 
@@ -20,8 +21,7 @@ public class MessageChecker
 
         var validatorTypes = typeof(ApplicationModule).Assembly.GetTypes()
             .Where(t => !t.IsAbstract && !t.IsInterface)
-            .Where(t => t.BaseType is { IsGenericType: true } &&
-                        t.BaseType.GetGenericTypeDefinition() == typeof(FluentMessageValidator<>)).ToList();
+            .Where(t => t.IsAssignableToGenericType(typeof(FluentMessageValidator<>))).ToList();
 
         var noValidatorMessageTypes = (from messageType in messageTypes
             let hasValidator =
