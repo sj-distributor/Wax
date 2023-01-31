@@ -23,7 +23,7 @@
 
   <files>
     <file src="README.md" />
-    <file src=".\**" target="content" exclude="**\bin\**;**\obj\**;**\.git\**;**\.github\**;**\*.user;**\.vs\**;**\.vscode\**;**\.gitignore;**\.idea\**" />
+    <file src=".\**" target="content" exclude="**\bin\**;**\obj\**;**\.git\**;**\.github\**;**\*.user;**\.vs\**;**\.vscode\**;**\.gitignore;**\.idea\**;**\LICENSE;**\README.md;" />
   </files>
 
 </package>
