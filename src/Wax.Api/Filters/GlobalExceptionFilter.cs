@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Wax.Core.Exceptions;
 
@@ -39,28 +38,12 @@ public class GlobalExceptionFilter : IExceptionFilter
     {
         _logger.Warning(context.Exception.Message);
 
-        var problemDetails = new ValidationProblemDetails
-        {
-            Instance = context.HttpContext.Request.Path,
-            Status = StatusCodes.Status400BadRequest,
-            Detail = "Please refer to the errors property for additional details."
-        };
-
-        problemDetails.Errors.Add("BusinessValidations", new string[] { context.Exception.Message });
-
-        context.Result = new BadRequestObjectResult(problemDetails);
-        context.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-    }
-
-    private void HandleInternalServerError(ExceptionContext context)
-    {
-        _logger.Error(context.Exception, context.Exception.Message);
-
         var problemDetails = new ProblemDetails
         {
-            Status = StatusCodes.Status500InternalServerError,
-            Title = "Internal error",
-            Detail = "An error occur.Try it again."
+            Status = StatusCodes.Status403Forbidden,
+            Title = "Business error",
+            Detail = context.Exception.Message,
+            Instance = context.HttpContext.Request.Path
         };
 
         context.Result = new ObjectResult(problemDetails);
@@ -76,7 +59,7 @@ public class GlobalExceptionFilter : IExceptionFilter
         {
             Status = StatusCodes.Status404NotFound,
             Title = "The specified resource was not found.",
-            Detail = exception.Message
+            Detail = exception.Message,
         };
 
         context.Result = new NotFoundObjectResult(details);
@@ -92,5 +75,19 @@ public class GlobalExceptionFilter : IExceptionFilter
         context.Result = new BadRequestObjectResult(details);
 
         context.ExceptionHandled = true;
+    }
+
+    private void HandleInternalServerError(ExceptionContext context)
+    {
+        _logger.Error(context.Exception, context.Exception.Message);
+
+        var problemDetails = new ProblemDetails
+        {
+            Status = StatusCodes.Status500InternalServerError,
+            Title = "Internal error",
+            Detail = "An error occur.Try it again later."
+        };
+
+        context.Result = new ObjectResult(problemDetails);
     }
 }

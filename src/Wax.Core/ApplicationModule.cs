@@ -3,15 +3,14 @@ using Autofac;
 using AutoMapper.Contrib.Autofac.DependencyInjection;
 using Mediator.Net;
 using Mediator.Net.Autofac;
-using Mediator.Net.Middlewares.Serilog;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Wax.Core.Data;
 using Wax.Core.Data.Repositories;
 using Wax.Core.DependencyInjection;
 using Wax.Core.Domain;
-using Wax.Core.Domain.Customers;
-using Wax.Core.Processing.FluentMessageValidator;
+using Wax.Core.Middlewares.FluentMessageValidator;
+using Wax.Core.Middlewares.Logging;
 using Wax.Core.Services.Identity;
 using Module = Autofac.Module;
 
@@ -32,7 +31,7 @@ namespace Wax.Core
             _connectionString = connectionString;
 
             _assemblies = (assemblies ?? Array.Empty<Assembly>())
-                .Concat(new[] {typeof(ApplicationModule).Assembly})
+                .Concat(new[] { typeof(ApplicationModule).Assembly })
                 .ToArray();
         }
 
@@ -88,9 +87,6 @@ namespace Wax.Core
             builder.RegisterGeneric(typeof(EfCoreRepository<>))
                 .As(typeof(IRepository<>))
                 .InstancePerLifetimeScope();
-            
-            //TODO: Register all repository
-            builder.RegisterType<EfCoreCustomerRepository>().As<ICustomerRepository>().InstancePerLifetimeScope();
         }
 
         private void RegisterIdentity(ContainerBuilder builder)
@@ -112,7 +108,7 @@ namespace Wax.Core
             mediatorBuilder.RegisterHandlers(_assemblies);
             mediatorBuilder.ConfigureGlobalReceivePipe(c =>
             {
-                c.UseSerilog(logger: _logger);
+                c.UseLogger();
                 c.UseMessageValidator();
             });
 
@@ -124,22 +120,6 @@ namespace Wax.Core
             builder.RegisterAssemblyTypes(_assemblies)
                 .Where(t => t.IsClass && typeof(IFluentMessageValidator).IsAssignableFrom(t))
                 .AsSelf().AsImplementedInterfaces();
-        }
-
-        private static bool IsAssignableToGenericType(Type givenType, Type genericType)
-        {
-            var interfaceTypes = givenType.GetInterfaces();
-
-            if (interfaceTypes.Any(it => it.IsGenericType && it.GetGenericTypeDefinition() == genericType))
-            {
-                return true;
-            }
-
-            if (givenType.IsGenericType && givenType.GetGenericTypeDefinition() == genericType)
-                return true;
-
-            var baseType = givenType.BaseType;
-            return baseType != null && IsAssignableToGenericType(baseType, genericType);
         }
     }
 }
