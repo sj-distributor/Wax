@@ -27,8 +27,9 @@ public class CreateCustomerTests : CustomerTestFixture
         {
             Name = "microsoft"
         };
-        
-        Repository.CheckIsUniqueNameAsync(command.Name).Returns(false);
+
+
+        Customers.CheckIsUniqueNameAsync(command.Name).Returns(false);
 
         await Should.ThrowAsync<CustomerNameAlreadyExistsException>(async () =>
             await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None));
@@ -42,11 +43,11 @@ public class CreateCustomerTests : CustomerTestFixture
             Name = "microsoft",
             Contact = "+861306888888"
         };
-        
-        Repository.CheckIsUniqueNameAsync(command.Name).Returns(true);
+
+        Customers.CheckIsUniqueNameAsync(command.Name).Returns(true);
 
         await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None);
 
-        await Repository.Received().InsertAsync(Arg.Any<Customer>());
+        await Customers.Received().InsertAsync(Arg.Any<Customer>());
     }
 }

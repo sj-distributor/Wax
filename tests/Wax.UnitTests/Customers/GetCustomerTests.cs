@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Mediator.Net.Context;
-using MockQueryable.NSubstitute;
 using NSubstitute;
 using Shouldly;
 using Wax.Core.Domain.Customers;
@@ -15,7 +14,7 @@ namespace Wax.UnitTests.Customers;
 public class GetCustomerTests : CustomerTestFixture
 {
     private readonly GetCustomerRequestHandler _handler;
-    
+
     public GetCustomerTests()
     {
         _handler = new GetCustomerRequestHandler(Mapper, Repository);
@@ -32,7 +31,7 @@ public class GetCustomerTests : CustomerTestFixture
             Contact = "+861306888888"
         };
 
-        Repository.Query.Returns(new[] { customer }.BuildMock());
+        Customers.GetByIdAsync(customer.Id).Returns(Task.FromResult(customer));
 
         var response = await _handler.Handle(new ReceiveContext<GetCustomerRequest>(
             new GetCustomerRequest

@@ -32,10 +32,10 @@ public class UpdateCustomerTests : CustomerTestFixture
             Name = "microsoft"
         };
 
-        Repository.GetByIdAsync(command.CustomerId)
+        Customers.GetByIdAsync(command.CustomerId)
             .Returns(new Customer { Id = command.CustomerId, Name = "google" });
 
-        Repository.CheckIsUniqueNameAsync(command.Name).Returns(false);
+        Customers.CheckIsUniqueNameAsync(command.Name).Returns(false);
 
         await Should.ThrowAsync<CustomerNameAlreadyExistsException>(async () =>
             await _handler.Handle(new ReceiveContext<UpdateCustomerCommand>(command), CancellationToken.None));
@@ -53,14 +53,14 @@ public class UpdateCustomerTests : CustomerTestFixture
             Contact = "+861306888888"
         };
 
-        Repository.GetByIdAsync(command.CustomerId).Returns(customer);
-        Repository.CheckIsUniqueNameAsync(command.Name).Returns(true);
+        Customers.GetByIdAsync(command.CustomerId).Returns(customer);
+        Customers.CheckIsUniqueNameAsync(command.Name).Returns(true);
 
         await _handler.Handle(new ReceiveContext<UpdateCustomerCommand>(command), CancellationToken.None);
 
         customer.Name.ShouldBe(command.Name);
         customer.Contact.ShouldBe(command.Contact);
 
-        await Repository.Received().UpdateAsync(Arg.Any<Customer>());
+        await Customers.Received().UpdateAsync(Arg.Any<Customer>());
     }
 }

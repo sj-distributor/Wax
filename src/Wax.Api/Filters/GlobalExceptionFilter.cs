@@ -40,12 +40,12 @@ public class GlobalExceptionFilter : IExceptionFilter
 
         var problemDetails = new ProblemDetails
         {
-            Status = StatusCodes.Status403Forbidden,
+            Status = StatusCodes.Status409Conflict,
             Title = "Business error",
             Detail = context.Exception.Message,
-            Instance = context.HttpContext.Request.Path
         };
 
+        //problemDetails.Extensions.Add(new KeyValuePair<string, object>("code", "1234"));
         context.Result = new ObjectResult(problemDetails);
     }
 

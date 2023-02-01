@@ -10,7 +10,7 @@ WilTechs Architecture Solution Template for .NET 6
 Using dotnet cli template, install the template: 
 
 ```
-dotnet new -i Wax.Template
+dotnet new install Wax.Template
 ```
 
 Run this command to create the solution:
