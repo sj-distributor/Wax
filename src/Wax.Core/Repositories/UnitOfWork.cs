@@ -6,15 +6,15 @@ namespace Wax.Core.Repositories;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;
-    private readonly ILifetimeScope _lifetimeScope;
+    private readonly IComponentContext _componentContext;
 
-    public UnitOfWork(ApplicationDbContext context, ILifetimeScope lifetimeScope)
+    public UnitOfWork(ApplicationDbContext context, IComponentContext componentContext)
     {
         _context = context;
-        _lifetimeScope = lifetimeScope;
+        _componentContext = componentContext;
     }
 
-    public ICustomerRepository Customers => _lifetimeScope.Resolve<ICustomerRepository>();
+    public ICustomerRepository Customers => _componentContext.Resolve<ICustomerRepository>();
 
     public Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
