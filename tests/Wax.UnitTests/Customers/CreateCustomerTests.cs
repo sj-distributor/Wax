@@ -17,7 +17,7 @@ public class CreateCustomerTests : CustomerTestFixture
 
     public CreateCustomerTests()
     {
-        _handler = new CreateCustomerCommandHandler(Mapper, Repository);
+        _handler = new CreateCustomerCommandHandler(Mapper, UnitOfWork);
     }
 
     [Fact]

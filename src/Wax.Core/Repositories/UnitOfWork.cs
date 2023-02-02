@@ -3,12 +3,12 @@ using Wax.Core.Data;
 
 namespace Wax.Core.Repositories;
 
-public class EfCoreRepository : IRepository
+public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;
     private readonly ILifetimeScope _lifetimeScope;
 
-    public EfCoreRepository(ApplicationDbContext context, ILifetimeScope lifetimeScope)
+    public UnitOfWork(ApplicationDbContext context, ILifetimeScope lifetimeScope)
     {
         _context = context;
         _lifetimeScope = lifetimeScope;

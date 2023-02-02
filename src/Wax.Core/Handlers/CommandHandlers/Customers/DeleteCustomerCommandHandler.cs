@@ -7,18 +7,18 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers;
 
 public class DeleteCustomerCommandHandler: ICommandHandler<DeleteCustomerCommand>
 {
-    private readonly IRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteCustomerCommandHandler(IRepository repository)
+    public DeleteCustomerCommandHandler(IUnitOfWork unitOfWork)
     {
-        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
     
     public async Task Handle(IReceiveContext<DeleteCustomerCommand> context, CancellationToken cancellationToken)
     {
-        var customer = await _repository.Customers.GetByIdAsync(context.Message.CustomerId, cancellationToken);
+        var customer = await _unitOfWork.Customers.GetByIdAsync(context.Message.CustomerId, cancellationToken);
 
-        await _repository.Customers.DeleteAsync(customer, cancellationToken);
-        await _repository.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.Customers.DeleteAsync(customer, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

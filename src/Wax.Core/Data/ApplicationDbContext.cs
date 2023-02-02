@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Wax.Core.Data.Configurations;
-using Wax.Core.Repositories;
 
 namespace Wax.Core.Data;
 
-public class ApplicationDbContext : DbContext, IUnitOfWork
+public class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {

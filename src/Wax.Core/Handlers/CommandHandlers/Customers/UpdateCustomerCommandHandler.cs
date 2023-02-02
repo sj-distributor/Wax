@@ -10,22 +10,22 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers;
 public class UpdateCustomerCommandHandler : ICommandHandler<UpdateCustomerCommand>
 {
     private readonly IMapper _mapper;
-    private readonly IRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateCustomerCommandHandler(IMapper mapper, IRepository repository)
+    public UpdateCustomerCommandHandler(IMapper mapper, IUnitOfWork unitOfWork)
     {
         _mapper = mapper;
-        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task Handle(IReceiveContext<UpdateCustomerCommand> context, CancellationToken cancellationToken)
     {
-        var customer = await _repository.Customers.GetByIdAsync(context.Message.CustomerId, cancellationToken)
+        var customer = await _unitOfWork.Customers.GetByIdAsync(context.Message.CustomerId, cancellationToken)
             .ConfigureAwait(false);
 
         if (customer.Name != context.Message.Name)
         {
-            if (!await _repository.Customers.CheckIsUniqueNameAsync(context.Message.Name, cancellationToken)
+            if (!await _unitOfWork.Customers.CheckIsUniqueNameAsync(context.Message.Name, cancellationToken)
                     .ConfigureAwait(false))
             {
                 throw new CustomerNameAlreadyExistsException();
@@ -34,7 +34,7 @@ public class UpdateCustomerCommandHandler : ICommandHandler<UpdateCustomerComman
 
         _mapper.Map(context.Message, customer);
 
-        await _repository.Customers.UpdateAsync(customer, cancellationToken).ConfigureAwait(false);
-        await _repository.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.Customers.UpdateAsync(customer, cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

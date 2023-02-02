@@ -2,7 +2,7 @@ using Xunit;
 
 namespace Wax.E2ETests
 {
-    public class UnitTest1
+    public class GlobalExceptionTests
     {
         [Fact]
         public void Test1()

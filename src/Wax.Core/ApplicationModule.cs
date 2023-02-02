@@ -87,7 +87,7 @@ namespace Wax.Core
                 .As(typeof(IBasicRepository<>))
                 .InstancePerLifetimeScope();
             
-            builder.RegisterType<EfCoreRepository>().As<IRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
         }
 
         private void RegisterIdentity(ContainerBuilder builder)

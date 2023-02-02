@@ -11,18 +11,18 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers
     public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerCommand, CreateCustomerResponse>
     {
         private readonly IMapper _mapper;
-        private readonly IRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateCustomerCommandHandler(IMapper mapper, IRepository repository)
+        public CreateCustomerCommandHandler(IMapper mapper, IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<CreateCustomerResponse> Handle(IReceiveContext<CreateCustomerCommand> context,
             CancellationToken cancellationToken)
         {
-            if (!await _repository.Customers.CheckIsUniqueNameAsync(context.Message.Name, cancellationToken)
+            if (!await _unitOfWork.Customers.CheckIsUniqueNameAsync(context.Message.Name, cancellationToken)
                     .ConfigureAwait(false))
             {
                 throw new CustomerNameAlreadyExistsException();
@@ -30,8 +30,8 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers
 
             var customer = _mapper.Map<Customer>(context.Message);
 
-            await _repository.Customers.InsertAsync(customer, cancellationToken).ConfigureAwait(false);
-            await _repository.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.Customers.InsertAsync(customer, cancellationToken).ConfigureAwait(false);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new CreateCustomerResponse { CustomerId = customer.Id };
         }

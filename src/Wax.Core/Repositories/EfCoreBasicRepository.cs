@@ -61,8 +61,8 @@ public class EfCoreBasicRepository<TEntity> : IBasicRepository<TEntity> where TE
         return Task.CompletedTask;
     }
 
-    public IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> predicate)
+    public IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> predicate = null)
     {
-        return _dbContext.Set<TEntity>().Where(predicate);
+        return predicate != null ? _dbContext.Set<TEntity>().Where(predicate) : _dbContext.Set<TEntity>();
     }
 }

@@ -10,18 +10,18 @@ namespace Wax.Core.Handlers.RequestHandlers.Customers;
 public class GetCustomerRequestHandler : IRequestHandler<GetCustomerRequest, GetCustomerResponse>
 {
     private readonly IMapper _mapper;
-    private readonly IRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public GetCustomerRequestHandler(IMapper mapper, IRepository repository)
+    public GetCustomerRequestHandler(IMapper mapper, IUnitOfWork unitOfWork)
     {
         _mapper = mapper;
-        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<GetCustomerResponse> Handle(IReceiveContext<GetCustomerRequest> context,
         CancellationToken cancellationToken)
     {
-        var customer = await _repository.Customers.GetByIdAsync(context.Message.CustomerId, cancellationToken);
+        var customer = await _unitOfWork.Customers.GetByIdAsync(context.Message.CustomerId, cancellationToken);
 
         return new GetCustomerResponse
         {

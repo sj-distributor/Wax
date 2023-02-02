@@ -18,5 +18,5 @@ public interface IBasicRepository<TEntity> where TEntity : class, IEntity
 
     Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
 
-    IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> predicate);
+    IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> predicate = null);
 }

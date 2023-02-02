@@ -20,7 +20,7 @@ public class UpdateCustomerTests : CustomerTestFixture
 
     public UpdateCustomerTests()
     {
-        _handler = new UpdateCustomerCommandHandler(Mapper, Repository);
+        _handler = new UpdateCustomerCommandHandler(Mapper, UnitOfWork);
     }
 
     [Fact]
