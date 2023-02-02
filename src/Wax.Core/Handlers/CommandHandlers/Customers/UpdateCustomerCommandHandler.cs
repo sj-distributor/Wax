@@ -20,13 +20,13 @@ public class UpdateCustomerCommandHandler : ICommandHandler<UpdateCustomerComman
 
     public async Task Handle(IReceiveContext<UpdateCustomerCommand> context, CancellationToken cancellationToken)
     {
-        var customer = await _unitOfWork.Customers.GetByIdAsync(context.Message.CustomerId, cancellationToken)
-            .ConfigureAwait(false);
+        var customer = await _unitOfWork.Customers.GetByIdAsync(context.Message.CustomerId, cancellationToken);
 
         if (customer.Name != context.Message.Name)
         {
-            if (!await _unitOfWork.Customers.CheckIsUniqueNameAsync(context.Message.Name, cancellationToken)
-                    .ConfigureAwait(false))
+            var existing = await _unitOfWork.Customers.FindByNameAsync(context.Message.Name, cancellationToken);
+
+            if (existing != null)
             {
                 throw new CustomerNameAlreadyExistsException();
             }

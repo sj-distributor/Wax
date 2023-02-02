@@ -22,8 +22,9 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers
         public async Task<CreateCustomerResponse> Handle(IReceiveContext<CreateCustomerCommand> context,
             CancellationToken cancellationToken)
         {
-            if (!await _unitOfWork.Customers.CheckIsUniqueNameAsync(context.Message.Name, cancellationToken)
-                    .ConfigureAwait(false))
+            var existing = await _unitOfWork.Customers.FindByNameAsync(context.Message.Name, cancellationToken);
+
+            if (existing != null)
             {
                 throw new CustomerNameAlreadyExistsException();
             }

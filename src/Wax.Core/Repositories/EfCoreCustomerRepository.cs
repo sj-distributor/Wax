@@ -7,15 +7,12 @@ namespace Wax.Core.Repositories;
 
 public class EfCoreCustomerRepository : EfCoreBasicRepository<Customer>, ICustomerRepository, IScopedDependency
 {
-    private readonly DbSet<Customer> _customers;
-
     public EfCoreCustomerRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
-        _customers = dbContext.Set<Customer>();
     }
 
-    public async Task<bool> CheckIsUniqueNameAsync(string name, CancellationToken cancellationToken = default)
+    public Task<Customer> FindByNameAsync(string name, CancellationToken cancellationToken = default)
     {
-        return !await _customers.AnyAsync(c => c.Name == name, cancellationToken).ConfigureAwait(false);
+        return Query(c => c.Name == name).FirstOrDefaultAsync(cancellationToken);
     }
 }
