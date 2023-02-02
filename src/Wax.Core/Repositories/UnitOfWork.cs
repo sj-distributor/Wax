@@ -20,4 +20,9 @@ public class UnitOfWork : IUnitOfWork
     {
         return _context.SaveChangesAsync(cancellationToken);
     }
+
+    public void Dispose()
+    {
+        _context?.Dispose();
+    }
 }
