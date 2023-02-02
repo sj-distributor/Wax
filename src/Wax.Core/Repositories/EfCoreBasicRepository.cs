@@ -19,7 +19,7 @@ public class EfCoreBasicRepository<TEntity> : IBasicRepository<TEntity> where TE
         where TKey : notnull
     {
         var entity = await _dbContext.Set<TEntity>()
-            .FindAsync(new object?[] { id }, cancellationToken).ConfigureAwait(false);
+            .FindAsync(new object[] { id }, cancellationToken).ConfigureAwait(false);
 
         if (entity == null)
         {
