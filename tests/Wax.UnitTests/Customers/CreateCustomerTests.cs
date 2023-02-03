@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Mediator.Net.Context;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using Shouldly;
 using Wax.Core.Domain.Customers;
 using Wax.Core.Domain.Customers.Exceptions;
@@ -17,7 +18,7 @@ public class CreateCustomerTests : CustomerTestFixture
 
     public CreateCustomerTests()
     {
-        _handler = new CreateCustomerCommandHandler(Mapper, Repository);
+        _handler = new CreateCustomerCommandHandler(Mapper, UnitOfWork);
     }
 
     [Fact]
@@ -27,8 +28,8 @@ public class CreateCustomerTests : CustomerTestFixture
         {
             Name = "microsoft"
         };
-        
-        Repository.CheckIsUniqueNameAsync(command.Name).Returns(false);
+
+        Customers.FindByNameAsync(command.Name).Returns(new Customer { Name = "google" });
 
         await Should.ThrowAsync<CustomerNameAlreadyExistsException>(async () =>
             await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None));
@@ -42,11 +43,11 @@ public class CreateCustomerTests : CustomerTestFixture
             Name = "microsoft",
             Contact = "+861306888888"
         };
-        
-        Repository.CheckIsUniqueNameAsync(command.Name).Returns(true);
+
+        Customers.FindByNameAsync(command.Name).ReturnsNull();
 
         await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None);
 
-        await Repository.Received().InsertAsync(Arg.Any<Customer>());
+        await Customers.Received().InsertAsync(Arg.Any<Customer>());
     }
 }

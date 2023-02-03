@@ -7,10 +7,12 @@ namespace Wax.Api.Filters;
 public class GlobalExceptionFilter : IExceptionFilter
 {
     private readonly Serilog.ILogger _logger;
+    private readonly IWebHostEnvironment _env;
 
-    public GlobalExceptionFilter(Serilog.ILogger logger)
+    public GlobalExceptionFilter(Serilog.ILogger logger, IWebHostEnvironment env)
     {
         _logger = logger;
+        _env = env;
     }
 
     public void OnException(ExceptionContext context)
@@ -40,12 +42,12 @@ public class GlobalExceptionFilter : IExceptionFilter
 
         var problemDetails = new ProblemDetails
         {
-            Status = StatusCodes.Status403Forbidden,
-            Title = "Business error",
+            Status = StatusCodes.Status409Conflict,
+            Title = "A business error occur.",
             Detail = context.Exception.Message,
-            Instance = context.HttpContext.Request.Path
         };
 
+        //problemDetails.Extensions.Add(new KeyValuePair<string, object>("code", "1234"));
         context.Result = new ObjectResult(problemDetails);
     }
 
@@ -84,8 +86,8 @@ public class GlobalExceptionFilter : IExceptionFilter
         var problemDetails = new ProblemDetails
         {
             Status = StatusCodes.Status500InternalServerError,
-            Title = "Internal error",
-            Detail = "An error occur.Try it again later."
+            Title = "Internal error.",
+            Detail = _env.IsDevelopment() ? context.Exception.Message : "An error occur. Try it again later."
         };
 
         context.Result = new ObjectResult(problemDetails);

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Mediator.Net;
 using Shouldly;
+using Wax.Core.Exceptions;
 using Wax.Messages.Commands.Customers;
 using Wax.Messages.Requests.Customers;
 using Xunit;
@@ -68,7 +69,7 @@ public class CustomerTests : TestBaseFixture
     public async Task ShouldDeleteCustomer()
     {
         var customerId = await CreateDefaultCustomer();
-        
+
         await Run<IMediator>(async mediator =>
         {
             await mediator.SendAsync(new DeleteCustomerCommand
@@ -76,13 +77,12 @@ public class CustomerTests : TestBaseFixture
                 CustomerId = customerId
             });
 
-            var getCustomerResponse = await mediator.RequestAsync<GetCustomerRequest, GetCustomerResponse>(
-                new GetCustomerRequest
-                {
-                    CustomerId = customerId
-                });
-
-            getCustomerResponse.Customer.ShouldBeNull();
+            await Should.ThrowAsync<EntityNotFoundException>(async () =>
+                await mediator.RequestAsync<GetCustomerRequest, GetCustomerResponse>(
+                    new GetCustomerRequest
+                    {
+                        CustomerId = customerId
+                    }));
         });
     }
 

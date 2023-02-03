@@ -6,11 +6,10 @@ using Mediator.Net.Autofac;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Wax.Core.Data;
-using Wax.Core.Data.Repositories;
 using Wax.Core.DependencyInjection;
-using Wax.Core.Domain;
 using Wax.Core.Middlewares.FluentMessageValidator;
 using Wax.Core.Middlewares.Logging;
+using Wax.Core.Repositories;
 using Wax.Core.Services.Identity;
 using Module = Autofac.Module;
 
@@ -84,9 +83,11 @@ namespace Wax.Core
                 }).AsSelf().As<DbContext>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterGeneric(typeof(EfCoreRepository<>))
-                .As(typeof(IRepository<>))
+            builder.RegisterGeneric(typeof(EfCoreBasicRepository<>))
+                .As(typeof(IBasicRepository<>))
                 .InstancePerLifetimeScope();
+            
+            builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
         }
 
         private void RegisterIdentity(ContainerBuilder builder)

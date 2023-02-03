@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Mediator.Net.Context;
 using Mediator.Net.Contracts;
-using Wax.Core.Domain.Customers;
 using Wax.Core.Domain.Customers.Exceptions;
+using Wax.Core.Repositories;
 using Wax.Messages.Commands.Customers;
 
 namespace Wax.Core.Handlers.CommandHandlers.Customers;
@@ -10,23 +10,23 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers;
 public class UpdateCustomerCommandHandler : ICommandHandler<UpdateCustomerCommand>
 {
     private readonly IMapper _mapper;
-    private readonly ICustomerRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateCustomerCommandHandler(IMapper mapper, ICustomerRepository repository)
+    public UpdateCustomerCommandHandler(IMapper mapper, IUnitOfWork unitOfWork)
     {
         _mapper = mapper;
-        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task Handle(IReceiveContext<UpdateCustomerCommand> context, CancellationToken cancellationToken)
     {
-        var customer = await _repository.GetByIdAsync(context.Message.CustomerId, cancellationToken)
-            .ConfigureAwait(false);
+        var customer = await _unitOfWork.Customers.GetByIdAsync(context.Message.CustomerId, cancellationToken);
 
         if (customer.Name != context.Message.Name)
         {
-            if (!await _repository.CheckIsUniqueNameAsync(context.Message.Name, cancellationToken)
-                    .ConfigureAwait(false))
+            var existing = await _unitOfWork.Customers.FindByNameAsync(context.Message.Name, cancellationToken);
+
+            if (existing != null)
             {
                 throw new CustomerNameAlreadyExistsException();
             }
@@ -34,6 +34,7 @@ public class UpdateCustomerCommandHandler : ICommandHandler<UpdateCustomerComman
 
         _mapper.Map(context.Message, customer);
 
-        await _repository.UpdateAsync(customer, cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.Customers.UpdateAsync(customer, cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

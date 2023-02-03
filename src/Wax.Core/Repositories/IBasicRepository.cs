@@ -1,8 +1,9 @@
 using System.Linq.Expressions;
+using Wax.Core.Domain;
 
-namespace Wax.Core.Domain;
+namespace Wax.Core.Repositories;
 
-public interface IRepository<TEntity> where TEntity : class, IEntity
+public interface IBasicRepository<TEntity> where TEntity : class, IEntity
 {
     Task<TEntity> GetByIdAsync<TKey>(TKey id, CancellationToken cancellationToken = default) where TKey : notnull;
 
@@ -17,5 +18,5 @@ public interface IRepository<TEntity> where TEntity : class, IEntity
 
     Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
 
-    IQueryable<TEntity> Query { get; }
+    IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> predicate = null);
 }

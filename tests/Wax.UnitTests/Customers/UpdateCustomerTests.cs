@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
 using Mediator.Net.Context;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using Shouldly;
 using Wax.Core.Domain.Customers;
 using Wax.Core.Domain.Customers.Exceptions;
 using Wax.Core.Handlers.CommandHandlers.Customers;
-using Wax.Core.Profiles;
 using Wax.Messages.Commands.Customers;
 using Xunit;
 
@@ -20,7 +19,7 @@ public class UpdateCustomerTests : CustomerTestFixture
 
     public UpdateCustomerTests()
     {
-        _handler = new UpdateCustomerCommandHandler(Mapper, Repository);
+        _handler = new UpdateCustomerCommandHandler(Mapper, UnitOfWork);
     }
 
     [Fact]
@@ -32,10 +31,10 @@ public class UpdateCustomerTests : CustomerTestFixture
             Name = "microsoft"
         };
 
-        Repository.GetByIdAsync(command.CustomerId)
+        Customers.GetByIdAsync(command.CustomerId)
             .Returns(new Customer { Id = command.CustomerId, Name = "google" });
 
-        Repository.CheckIsUniqueNameAsync(command.Name).Returns(false);
+        Customers.FindByNameAsync(command.Name).Returns(new Customer { Name = "meta" });
 
         await Should.ThrowAsync<CustomerNameAlreadyExistsException>(async () =>
             await _handler.Handle(new ReceiveContext<UpdateCustomerCommand>(command), CancellationToken.None));
@@ -53,14 +52,14 @@ public class UpdateCustomerTests : CustomerTestFixture
             Contact = "+861306888888"
         };
 
-        Repository.GetByIdAsync(command.CustomerId).Returns(customer);
-        Repository.CheckIsUniqueNameAsync(command.Name).Returns(true);
+        Customers.GetByIdAsync(command.CustomerId).Returns(customer);
+        Customers.FindByNameAsync(command.Name).ReturnsNull();
 
         await _handler.Handle(new ReceiveContext<UpdateCustomerCommand>(command), CancellationToken.None);
 
         customer.Name.ShouldBe(command.Name);
         customer.Contact.ShouldBe(command.Contact);
 
-        await Repository.Received().UpdateAsync(Arg.Any<Customer>());
+        await Customers.Received().UpdateAsync(Arg.Any<Customer>());
     }
 }

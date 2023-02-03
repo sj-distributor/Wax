@@ -1,13 +1,16 @@
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+using Wax.Core.Data;
 using Wax.Core.Domain;
 using Wax.Core.Exceptions;
 
-namespace Wax.Core.Data.Repositories;
+namespace Wax.Core.Repositories;
 
-public class EfCoreRepository<TEntity> : IRepository<TEntity> where TEntity : class, IEntity
+public class EfCoreBasicRepository<TEntity> : IBasicRepository<TEntity> where TEntity : class, IEntity
 {
     private readonly ApplicationDbContext _dbContext;
 
-    public EfCoreRepository(ApplicationDbContext dbContext)
+    public EfCoreBasicRepository(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
     }
@@ -16,7 +19,7 @@ public class EfCoreRepository<TEntity> : IRepository<TEntity> where TEntity : cl
         where TKey : notnull
     {
         var entity = await _dbContext.Set<TEntity>()
-            .FindAsync(new object?[] { id }, cancellationToken).ConfigureAwait(false);
+            .FindAsync(new object[] { id }, cancellationToken).ConfigureAwait(false);
 
         if (entity == null)
         {
@@ -29,7 +32,6 @@ public class EfCoreRepository<TEntity> : IRepository<TEntity> where TEntity : cl
     public async Task<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         await _dbContext.Set<TEntity>().AddAsync(entity, cancellationToken).ConfigureAwait(false);
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return entity;
     }
 
@@ -37,29 +39,30 @@ public class EfCoreRepository<TEntity> : IRepository<TEntity> where TEntity : cl
         CancellationToken cancellationToken = default)
     {
         await _dbContext.Set<TEntity>().AddRangeAsync(entity, cancellationToken).ConfigureAwait(false);
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return entity;
     }
 
-    public async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
+    public Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        _dbContext.Update(entity);
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        _dbContext.Entry(entity).State = EntityState.Modified;
+        return Task.CompletedTask;
     }
 
-    public async Task UpdateRangeAsync(IEnumerable<TEntity> entities,
+    public Task UpdateRangeAsync(IEnumerable<TEntity> entities,
         CancellationToken cancellationToken = default)
     {
         _dbContext.Set<TEntity>().UpdateRange(entities);
-
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return Task.CompletedTask;
     }
 
-    public async Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
+    public Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         _dbContext.Set<TEntity>().Remove(entity);
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return Task.CompletedTask;
     }
 
-    public IQueryable<TEntity> Query => _dbContext.Set<TEntity>();
+    public IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> predicate = null)
+    {
+        return predicate != null ? _dbContext.Set<TEntity>().Where(predicate) : _dbContext.Set<TEntity>();
+    }
 }
