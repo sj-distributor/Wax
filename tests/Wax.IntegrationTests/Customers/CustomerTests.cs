@@ -9,8 +9,12 @@ using Xunit;
 
 namespace Wax.IntegrationTests.Customers;
 
-public class CustomerTests : TestBaseFixture
+public class CustomerTests : IntegrationTestBase
 {
+    public CustomerTests(IntegrationFixture fixture) : base(fixture)
+    {
+    }
+
     [Fact]
     public async Task ShouldCreateNewCustomer()
     {
