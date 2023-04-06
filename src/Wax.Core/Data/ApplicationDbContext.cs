@@ -18,4 +18,16 @@ public class ApplicationDbContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CustomerEntityTypeConfiguration).Assembly);
     }
+    
+    public bool HasEntitiesChanged { get; private set; }
+    
+    public async Task ChangeEntitiesAsync(bool saveNow = false, CancellationToken cancellationToken = default)
+    {
+        HasEntitiesChanged = true;
+
+        if (saveNow)
+        {
+            await SaveChangesAsync(cancellationToken);
+        }
+    }
 }

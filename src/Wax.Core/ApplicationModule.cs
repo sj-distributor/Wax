@@ -4,13 +4,16 @@ using AutoMapper.Contrib.Autofac.DependencyInjection;
 using Mediator.Net;
 using Mediator.Net.Autofac;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using Wax.Core.Data;
 using Wax.Core.DependencyInjection;
 using Wax.Core.Middlewares.FluentMessageValidator;
 using Wax.Core.Middlewares.Logging;
+using Wax.Core.Middlewares.UnitOfWorks;
 using Wax.Core.Repositories;
 using Wax.Core.Services.Identity;
+using Wax.Core.Settings;
 using Module = Autofac.Module;
 
 namespace Wax.Core
@@ -19,15 +22,15 @@ namespace Wax.Core
     {
         private readonly ILogger _logger;
         private readonly ICurrentUser _currentUser;
-        private readonly string _connectionString;
+        private readonly IConfiguration _configuration;
         private readonly Assembly[] _assemblies;
 
-        public ApplicationModule(ILogger logger, ICurrentUser currentUser, string connectionString,
+        public ApplicationModule(ILogger logger, ICurrentUser currentUser, IConfiguration configuration,
             params Assembly[] assemblies)
         {
             _logger = logger;
             _currentUser = currentUser;
-            _connectionString = connectionString;
+            _configuration = configuration;
 
             _assemblies = (assemblies ?? Array.Empty<Assembly>())
                 .Concat(new[] { typeof(ApplicationModule).Assembly })
@@ -43,6 +46,19 @@ namespace Wax.Core
             RegisterLogger(builder);
             RegisterMediator(builder);
             RegisterValidator(builder);
+        }
+        
+        private void RegisterSettings(ContainerBuilder builder)
+        {
+            builder.RegisterInstance(_configuration)
+                .As<IConfiguration>()
+                .SingleInstance();
+
+            var settingTypes = _assemblies.SelectMany(a => a.GetTypes())
+                .Where(t => t.IsClass && typeof(IConfigurationSetting).IsAssignableFrom(t))
+                .ToArray();
+
+            builder.RegisterTypes(settingTypes).AsSelf().SingleInstance();
         }
 
         private void RegisterAutoMapper(ContainerBuilder builder)
@@ -70,7 +86,9 @@ namespace Wax.Core
         {
             builder.Register(c =>
                 {
-                    if (!string.IsNullOrEmpty(_connectionString))
+                    var connectionString = _configuration.GetConnectionString("Default");
+
+                    if (!string.IsNullOrEmpty(connectionString))
                     {
                         //Select your database provider
                     }
@@ -83,10 +101,10 @@ namespace Wax.Core
                 }).AsSelf().As<DbContext>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterGeneric(typeof(EfCoreBasicRepository<>))
+            builder.RegisterGeneric(typeof(BasicRepository<>))
                 .As(typeof(IBasicRepository<>))
                 .InstancePerLifetimeScope();
-            
+
             builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
         }
 
@@ -111,6 +129,7 @@ namespace Wax.Core
             {
                 c.UseLogger();
                 c.UseMessageValidator();
+                c.UseUnitOfWork();
             });
 
             builder.RegisterMediator(mediatorBuilder);

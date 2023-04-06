@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Autofac;
+using Wax.Core.Data;
 using Wax.Core.Repositories;
 using Xunit;
 

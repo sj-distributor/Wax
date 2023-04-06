@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using Autofac;
+using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using Serilog;
 using Wax.Core;
@@ -17,7 +19,11 @@ public class IntegrationFixture : IDisposable, ICollectionFixture<IntegrationFix
         var containerBuilder = new ContainerBuilder();
         var logger = Substitute.For<ILogger>();
 
-        containerBuilder.RegisterModule(new ApplicationModule(logger, new IntegrationTestUser(), "",
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", false, true).Build();
+
+        containerBuilder.RegisterModule(new ApplicationModule(logger, new IntegrationTestUser(), configuration,
             typeof(IntegrationFixture).Assembly));
 
         LifetimeScope = containerBuilder.Build();
