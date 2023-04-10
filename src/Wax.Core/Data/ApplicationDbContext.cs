@@ -9,6 +9,8 @@ public class ApplicationDbContext : DbContext
     {
     }
 
+    public bool HasEntitiesChanged { get; private set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseInMemoryDatabase("__wax_database");
@@ -17,5 +19,25 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CustomerEntityTypeConfiguration).Assembly);
+    }
+
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+    {
+        var result = base.SaveChangesAsync(cancellationToken);
+
+        HasEntitiesChanged = false;
+
+        return result;
+    }
+
+    public async Task ChangeEntitiesAsync(bool saveNow = false, CancellationToken cancellationToken = default)
+    {
+        HasEntitiesChanged = true;
+
+        if (saveNow)
+        {
+            await SaveChangesAsync(cancellationToken);
+        }
     }
 }

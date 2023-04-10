@@ -42,12 +42,11 @@ public class Startup
         var serviceProvider = _serviceCollection.BuildServiceProvider();
 
         var currentUser = serviceProvider.GetRequiredService<ICurrentUser>();
-        var connectionString = Configuration.GetConnectionString("Default");
 
         // Register your own things directly with Autofac here. Don't
         // call builder.Populate(), that happens in AutofacServiceProviderFactory
         // for you.
-        builder.RegisterModule(new ApplicationModule(Log.Logger, currentUser, connectionString,
+        builder.RegisterModule(new ApplicationModule(Log.Logger, currentUser, Configuration,
             typeof(Startup).Assembly));
     }
 

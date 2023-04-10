@@ -5,18 +5,21 @@ namespace Wax.Core.Repositories;
 
 public interface IBasicRepository<TEntity> where TEntity : class, IEntity
 {
-    Task<TEntity> GetByIdAsync<TKey>(TKey id, CancellationToken cancellationToken = default) where TKey : notnull;
+    Task<TEntity> GetByIdAsync<TKey>(TKey id) where TKey : notnull;
 
-    Task<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default);
+    Task<TEntity> InsertAsync(TEntity entity, bool saveNow = false);
 
-    Task<IEnumerable<TEntity>> InsertRangeAsync(IEnumerable<TEntity> entity,
-        CancellationToken cancellationToken = default);
+    Task InsertRangeAsync(IEnumerable<TEntity> entity, bool saveNow = false);
 
-    Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
+    Task UpdateAsync(TEntity entity, bool saveNow = false);
 
-    Task UpdateRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
+    Task UpdateRangeAsync(IEnumerable<TEntity> entities, bool saveNow = false);
 
-    Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
+    Task DeleteAsync(TEntity entity, bool saveNow = false);
 
-    IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> predicate = null);
+    Task DeleteRangeAsync(IEnumerable<TEntity> entity, bool saveNow = false);
+
+    Task<List<TEntity>> ListAsync(Expression<Func<TEntity, bool>> predicate = null);
+
+    IQueryable<TEntity> Table { get; }
 }
