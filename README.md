@@ -3,7 +3,7 @@
 [![.NET](https://github.com/sj-distributor/Wax/actions/workflows/dotnet.yml/badge.svg)](https://github.com/sj-distributor/Wax/actions/workflows/dotnet.yml)
 [![Nuget](https://img.shields.io/nuget/v/Wax.Template)](https://www.nuget.org/packages/Wax.Template)
 
-WilTechs Architecture Solution Template for .NET 6
+WilTechs Architecture Solution Template for .NET 7
 
 ## Getting Started
 
