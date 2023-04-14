@@ -39,6 +39,7 @@ namespace Wax.Core
 
         protected override void Load(ContainerBuilder builder)
         {
+            RegisterSettings(builder);
             RegisterAutoMapper(builder);
             RegisterDependency(builder);
             RegisterDatabase(builder);

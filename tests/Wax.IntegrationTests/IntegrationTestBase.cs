@@ -34,18 +34,6 @@ public class IntegrationTestBase : IDisposable
         return await action(dependency);
     }
 
-    protected async Task<TR> RunWithUnitOfWork<TR>(Func<IUnitOfWork, Task<TR>> action)
-    {
-        var uow = _fixture.LifetimeScope.BeginLifetimeScope().Resolve<IUnitOfWork>();
-        return await action(uow);
-    }
-    
-    protected async Task RunWithUnitOfWork(Func<IUnitOfWork, Task> action)
-    {
-        var uow = _fixture.LifetimeScope.BeginLifetimeScope().Resolve<IUnitOfWork>();
-        await action(uow);
-    }
-
     public void Dispose()
     {
         _fixture.Cleanup();
