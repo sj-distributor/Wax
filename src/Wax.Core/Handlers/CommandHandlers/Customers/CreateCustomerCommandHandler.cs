@@ -13,7 +13,6 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers
     {
         private readonly IMapper _mapper;
         private readonly ICustomerRepository _customerRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
         public CreateCustomerCommandHandler(IMapper mapper,ICustomerRepository customerRepository)
         {
