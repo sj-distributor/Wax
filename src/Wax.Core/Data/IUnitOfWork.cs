@@ -1,8 +1,11 @@
+using Wax.Core.Repositories;
+
 namespace Wax.Core.Data;
 
 public interface IUnitOfWork
 {
-    Task CommitAsync(CancellationToken cancellationToken = default);
+    ICustomerRepository Customers { get; }
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
 public class UnitOfWork : IUnitOfWork
@@ -14,8 +17,15 @@ public class UnitOfWork : IUnitOfWork
         _context = context;
     }
 
-    public Task CommitAsync(CancellationToken cancellationToken = default)
+    private ICustomerRepository _customers;
+
+    public ICustomerRepository Customers
     {
-        return _context.HasEntitiesChanged ? _context.SaveChangesAsync(cancellationToken) : Task.CompletedTask;
+        get { return _customers ??= new CustomerRepository(_context); }
+    }
+
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return _context.SaveChangesAsync(cancellationToken);
     }
 }

@@ -15,10 +15,10 @@ public class BasicRepository<TEntity> : IBasicRepository<TEntity> where TEntity 
         _dbContext = dbContext;
     }
 
-    public async Task<TEntity> GetByIdAsync<TKey>(TKey id)
+    public async Task<TEntity> GetByIdAsync<TKey>(TKey id, CancellationToken cancellationToken = default)
         where TKey : notnull
     {
-        var entity = await _dbContext.Set<TEntity>().FindAsync(new object[] { id }).ConfigureAwait(false);
+        var entity = await _dbContext.Set<TEntity>().FindAsync(id);
 
         if (entity == null)
         {
@@ -28,51 +28,47 @@ public class BasicRepository<TEntity> : IBasicRepository<TEntity> where TEntity 
         return entity;
     }
 
-    public async Task<TEntity> InsertAsync(TEntity entity, bool saveNow = false)
+    public async Task<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        var entry = await _dbContext.Set<TEntity>().AddAsync(entity).ConfigureAwait(false);
-
-        await _dbContext.ChangeEntitiesAsync(saveNow);
-
+        var entry = await _dbContext.Set<TEntity>().AddAsync(entity, cancellationToken);
         return entry.Entity;
     }
 
-    public async Task InsertRangeAsync(IEnumerable<TEntity> entity, bool saveNow = false)
+    public Task InsertRangeAsync(IEnumerable<TEntity> entity, CancellationToken cancellationToken = default)
     {
-        await _dbContext.Set<TEntity>().AddRangeAsync(entity).ConfigureAwait(false);
-
-        await _dbContext.ChangeEntitiesAsync(saveNow);
+        return _dbContext.Set<TEntity>().AddRangeAsync(entity, cancellationToken);
     }
 
-    public Task UpdateAsync(TEntity entity, bool saveNow = false)
+    public Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         _dbContext.Entry(entity).State = EntityState.Modified;
-        return _dbContext.ChangeEntitiesAsync(saveNow);
+        return Task.CompletedTask;
     }
 
-    public Task UpdateRangeAsync(IEnumerable<TEntity> entities, bool saveNow = false)
+    public Task UpdateRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
     {
         _dbContext.Set<TEntity>().UpdateRange(entities);
-        return _dbContext.ChangeEntitiesAsync(saveNow);
+        return Task.CompletedTask;
     }
 
-    public Task DeleteAsync(TEntity entity, bool saveNow = false)
+    public Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         _dbContext.Set<TEntity>().Remove(entity);
-        return _dbContext.ChangeEntitiesAsync(saveNow);
+        return Task.CompletedTask;
     }
 
-    public Task DeleteRangeAsync(IEnumerable<TEntity> entity, bool saveNow = false)
+    public Task DeleteRangeAsync(IEnumerable<TEntity> entity, CancellationToken cancellationToken = default)
     {
         _dbContext.Set<TEntity>().RemoveRange(entity);
-        return _dbContext.ChangeEntitiesAsync(saveNow);
+        return Task.CompletedTask;
     }
 
-    public Task<List<TEntity>> ListAsync(Expression<Func<TEntity, bool>> predicate = null)
+    public Task<List<TEntity>> ListAsync(Expression<Func<TEntity, bool>> predicate = null,
+        CancellationToken cancellationToken = default)
     {
         return predicate == null
-            ? _dbContext.Set<TEntity>().ToListAsync()
-            : _dbContext.Set<TEntity>().Where(predicate).ToListAsync();
+            ? _dbContext.Set<TEntity>().ToListAsync(cancellationToken)
+            : _dbContext.Set<TEntity>().Where(predicate).ToListAsync(cancellationToken);
     }
 
 

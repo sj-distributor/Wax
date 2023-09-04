@@ -42,7 +42,7 @@ namespace Wax.E2ETests
         {
             var client = _factory.CreateClient();
 
-            var response = await client.GetAsync($"/customers/{Guid.NewGuid()}");
+            var response = await client.DeleteAsync($"/customers/{Guid.NewGuid()}");
 
             response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
@@ -53,6 +53,7 @@ namespace Wax.E2ETests
             problemDetails.Title.ShouldBe("The specified resource was not found.");
             problemDetails.Detail.ShouldStartWith("Entity not found");
         }
+
 
         [Fact]
         public async Task ShouldReturn409StatusCodeWhenBusinessError()

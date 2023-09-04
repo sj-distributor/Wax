@@ -10,7 +10,6 @@ using Wax.Core.Data;
 using Wax.Core.DependencyInjection;
 using Wax.Core.Middlewares.FluentMessageValidator;
 using Wax.Core.Middlewares.Logging;
-using Wax.Core.Middlewares.UnitOfWorks;
 using Wax.Core.Repositories;
 using Wax.Core.Services.Identity;
 using Wax.Core.Settings;
@@ -130,7 +129,6 @@ namespace Wax.Core
             {
                 c.UseLogger();
                 c.UseMessageValidator();
-                c.UseUnitOfWork();
             });
 
             builder.RegisterMediator(mediatorBuilder);

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Mediator.Net.Context;
 using Mediator.Net.Contracts;
+using Microsoft.EntityFrameworkCore;
 using Wax.Core.Data;
 using Wax.Core.Repositories;
 using Wax.Messages.Dtos.Customers;
@@ -10,23 +11,26 @@ namespace Wax.Core.Handlers.RequestHandlers.Customers;
 
 public class GetCustomerRequestHandler : IRequestHandler<GetCustomerRequest, GetCustomerResponse>
 {
-    private readonly IMapper _mapper;
-    private readonly ICustomerRepository _customerRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public GetCustomerRequestHandler(IMapper mapper, ICustomerRepository customerRepository)
+    public GetCustomerRequestHandler(IUnitOfWork unitOfWork)
     {
-        _mapper = mapper;
-        _customerRepository = customerRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<GetCustomerResponse> Handle(IReceiveContext<GetCustomerRequest> context,
         CancellationToken cancellationToken)
     {
-        var customer = await _customerRepository.GetByIdAsync(context.Message.CustomerId);
-
         return new GetCustomerResponse
         {
-            Customer = _mapper.Map<CustomerShortInfo>(customer)
+            Data = await _unitOfWork.Customers.Table
+                .Where(c => c.Id == context.Message.CustomerId)
+                .Select(c => new CustomerShortInfo
+                {
+                    Id = c.Id,
+                    Address = c.Address,
+                    Name = c.Name
+                }).FirstOrDefaultAsync(cancellationToken)
         };
     }
 }

@@ -10,5 +10,5 @@ public class GetCustomerRequest : IRequest
 
 public class GetCustomerResponse : IResponse
 {
-    public CustomerShortInfo Customer { get; set; }
+    public CustomerShortInfo Data { get; set; }
 }

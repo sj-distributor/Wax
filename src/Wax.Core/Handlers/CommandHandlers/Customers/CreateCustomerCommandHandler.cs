@@ -4,7 +4,6 @@ using Mediator.Net.Contracts;
 using Wax.Core.Data;
 using Wax.Core.Domain.Customers;
 using Wax.Core.Domain.Customers.Exceptions;
-using Wax.Core.Repositories;
 using Wax.Messages.Commands.Customers;
 
 namespace Wax.Core.Handlers.CommandHandlers.Customers
@@ -12,18 +11,18 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers
     public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerCommand, CreateCustomerResponse>
     {
         private readonly IMapper _mapper;
-        private readonly ICustomerRepository _customerRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateCustomerCommandHandler(IMapper mapper,ICustomerRepository customerRepository)
+        public CreateCustomerCommandHandler(IMapper mapper, IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
-            _customerRepository = customerRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<CreateCustomerResponse> Handle(IReceiveContext<CreateCustomerCommand> context,
             CancellationToken cancellationToken)
         {
-            var existing = await _customerRepository.FindByNameAsync(context.Message.Name);
+            var existing = await _unitOfWork.Customers.FindByNameAsync(context.Message.Name);
 
             if (existing != null)
             {
@@ -32,7 +31,8 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers
 
             var customer = _mapper.Map<Customer>(context.Message);
 
-            await _customerRepository.InsertAsync(customer);
+            await _unitOfWork.Customers.InsertAsync(customer, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new CreateCustomerResponse { CustomerId = customer.Id };
         }

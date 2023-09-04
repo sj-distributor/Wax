@@ -36,8 +36,8 @@ public class CustomerTests : IntegrationTestBase
                     CustomerId = createCustomerResponse.CustomerId
                 });
 
-            getCustomerResponse.Customer.Name.ShouldBe(createCustomerCommand.Name);
-            getCustomerResponse.Customer.Address.ShouldBe(createCustomerCommand.Address);
+            getCustomerResponse.Data.Name.ShouldBe(createCustomerCommand.Name);
+            getCustomerResponse.Data.Address.ShouldBe(createCustomerCommand.Address);
         });
     }
 
@@ -64,8 +64,8 @@ public class CustomerTests : IntegrationTestBase
                     CustomerId = updateCustomerCommand.CustomerId
                 });
 
-            getCustomerResponse.Customer.Name.ShouldBe(updateCustomerCommand.Name);
-            getCustomerResponse.Customer.Address.ShouldBe(updateCustomerCommand.Address);
+            getCustomerResponse.Data.Name.ShouldBe(updateCustomerCommand.Name);
+            getCustomerResponse.Data.Address.ShouldBe(updateCustomerCommand.Address);
         });
     }
 
@@ -81,12 +81,13 @@ public class CustomerTests : IntegrationTestBase
                 CustomerId = customerId
             });
 
-            await Should.ThrowAsync<EntityNotFoundException>(async () =>
-                await mediator.RequestAsync<GetCustomerRequest, GetCustomerResponse>(
-                    new GetCustomerRequest
-                    {
-                        CustomerId = customerId
-                    }));
+            var response = await mediator.RequestAsync<GetCustomerRequest, GetCustomerResponse>(
+                new GetCustomerRequest
+                {
+                    CustomerId = customerId
+                });
+
+            response.Data.ShouldBeNull();
         });
     }
 

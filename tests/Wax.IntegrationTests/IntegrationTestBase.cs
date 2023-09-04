@@ -8,34 +8,41 @@ using Xunit;
 namespace Wax.IntegrationTests;
 
 [Collection("Sequential")]
-public class IntegrationTestBase : IDisposable
+public class IntegrationTestBase : IAsyncLifetime
 {
-    private readonly IntegrationFixture _fixture;
+    private readonly ILifetimeScope _lifetimeScope;
+    private readonly Func<Task> _resetDatabase;
 
-    protected IntegrationTestBase(IntegrationFixture fixture)
+    public IntegrationTestBase(IntegrationFixture fixture)
     {
-        _fixture = fixture;
+        _lifetimeScope = fixture.LifetimeScope;
+        _resetDatabase = fixture.ResetDatabase;
     }
 
     protected async Task Run<T>(Func<T, Task> action, Action<ContainerBuilder> extraRegistration = null)
     {
         var dependency = extraRegistration != null
-            ? _fixture.LifetimeScope.BeginLifetimeScope(extraRegistration).Resolve<T>()
-            : _fixture.LifetimeScope.BeginLifetimeScope().Resolve<T>();
+            ? _lifetimeScope.BeginLifetimeScope(extraRegistration).Resolve<T>()
+            : _lifetimeScope.BeginLifetimeScope().Resolve<T>();
         await action(dependency);
     }
 
     protected async Task<TR> Run<T, TR>(Func<T, Task<TR>> action, Action<ContainerBuilder> extraRegistration = null)
     {
         var dependency = extraRegistration != null
-            ? _fixture.LifetimeScope.BeginLifetimeScope(extraRegistration).Resolve<T>()
-            : _fixture.LifetimeScope.BeginLifetimeScope().Resolve<T>();
+            ? _lifetimeScope.BeginLifetimeScope(extraRegistration).Resolve<T>()
+            : _lifetimeScope.BeginLifetimeScope().Resolve<T>();
 
         return await action(dependency);
     }
 
-    public void Dispose()
+    public virtual Task InitializeAsync()
     {
-        _fixture.Cleanup();
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        return _resetDatabase();
     }
 }

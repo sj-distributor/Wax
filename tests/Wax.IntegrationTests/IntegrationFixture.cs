@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
@@ -10,7 +11,7 @@ using Xunit;
 
 namespace Wax.IntegrationTests;
 
-public class IntegrationFixture : IDisposable, ICollectionFixture<IntegrationFixture>
+public class IntegrationFixture : IAsyncLifetime
 {
     public readonly ILifetimeScope LifetimeScope;
 
@@ -40,12 +41,22 @@ public class IntegrationFixture : IDisposable, ICollectionFixture<IntegrationFix
         var dbContext = LifetimeScope.Resolve<ApplicationDbContext>();
         dbContext.Database.EnsureDeleted();
     }
-}
 
-[CollectionDefinition("Sequential")]
-public class DatabaseCollection : ICollectionFixture<IntegrationFixture>
-{
-    // This class has no code, and is never created. Its purpose is simply
-    // to be the place to apply [CollectionDefinition] and all the
-    // ICollectionFixture<> interfaces.
+    public Task InitializeAsync()
+    {
+        //Init database
+        return Task.CompletedTask;
+    }
+
+    public Task ResetDatabase()
+    {
+        var context = LifetimeScope.Resolve<ApplicationDbContext>();
+        return context.Database.EnsureDeletedAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        var context = LifetimeScope.Resolve<ApplicationDbContext>();
+        return context.Database.EnsureDeletedAsync();
+    }
 }

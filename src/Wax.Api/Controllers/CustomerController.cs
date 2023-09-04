@@ -34,7 +34,7 @@ namespace Wax.Api.Controllers
             return Ok(response);
         }
 
-        [HttpPut]
+        [HttpPatch]
         [ProducesResponseType(200)]
         public async Task<IActionResult> UpdateAsync([FromBody] UpdateCustomerCommand command)
         {
@@ -42,11 +42,12 @@ namespace Wax.Api.Controllers
             return Ok();
         }
 
-        [HttpDelete]
+       
+        [HttpDelete("{id:guid}")]
         [ProducesResponseType(200)]
-        public async Task<IActionResult> DeleteAsync([FromBody] DeleteCustomerCommand command)
+        public async Task<IActionResult> DeleteAsync([FromRoute] Guid id)
         {
-            await _mediator.SendAsync(command);
+            await _mediator.SendAsync(new DeleteCustomerCommand { CustomerId = id });
             return Ok();
         }
     }

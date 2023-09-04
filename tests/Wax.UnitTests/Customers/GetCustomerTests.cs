@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mediator.Net.Context;
+using MockQueryable.NSubstitute;
 using NSubstitute;
 using Shouldly;
 using Wax.Core.Domain.Customers;
@@ -17,8 +19,9 @@ public class GetCustomerTests : CustomerTestFixture
 
     public GetCustomerTests()
     {
-        _handler = new GetCustomerRequestHandler(Mapper, Customers);
+        _handler = new GetCustomerRequestHandler(UnitOfWork);
     }
+
 
     [Fact]
     public async Task ShouldGetCustomer()
@@ -31,7 +34,7 @@ public class GetCustomerTests : CustomerTestFixture
             Contact = "+861306888888"
         };
 
-        Customers.GetByIdAsync(customer.Id).Returns(Task.FromResult(customer));
+        Customers.Table.Returns(new List<Customer> { customer }.BuildMock());
 
         var response = await _handler.Handle(new ReceiveContext<GetCustomerRequest>(
             new GetCustomerRequest
@@ -39,9 +42,9 @@ public class GetCustomerTests : CustomerTestFixture
                 CustomerId = customer.Id
             }), CancellationToken.None);
 
-        response.Customer.ShouldNotBeNull();
-        response.Customer.Id.ShouldBe(customer.Id);
-        response.Customer.Name.ShouldBe(customer.Name);
-        response.Customer.Address.ShouldBe(customer.Address);
+        response.Data.ShouldNotBeNull();
+        response.Data.Id.ShouldBe(customer.Id);
+        response.Data.Name.ShouldBe(customer.Name);
+        response.Data.Address.ShouldBe(customer.Address);
     }
 }
