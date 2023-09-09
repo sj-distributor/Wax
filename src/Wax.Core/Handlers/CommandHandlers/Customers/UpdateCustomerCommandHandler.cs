@@ -11,21 +11,21 @@ namespace Wax.Core.Handlers.CommandHandlers.Customers;
 public class UpdateCustomerCommandHandler : ICommandHandler<UpdateCustomerCommand>
 {
     private readonly IMapper _mapper;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IRepositoryProvider _provider;
 
-    public UpdateCustomerCommandHandler(IMapper mapper, IUnitOfWork unitOfWork)
+    public UpdateCustomerCommandHandler(IMapper mapper, IRepositoryProvider provider)
     {
         _mapper = mapper;
-        _unitOfWork = unitOfWork;
+        _provider = provider;
     }
 
     public async Task Handle(IReceiveContext<UpdateCustomerCommand> context, CancellationToken cancellationToken)
     {
-        var customer = await _unitOfWork.Customers.GetByIdAsync(context.Message.CustomerId, cancellationToken);
+        var customer = await _provider.Customers.GetByIdAsync(context.Message.CustomerId, cancellationToken);
 
         if (customer.Name != context.Message.Name)
         {
-            var existing = await _unitOfWork.Customers.FindByNameAsync(context.Message.Name);
+            var existing = await _provider.Customers.FindByNameAsync(context.Message.Name);
 
             if (existing != null)
             {
@@ -35,7 +35,6 @@ public class UpdateCustomerCommandHandler : ICommandHandler<UpdateCustomerComman
 
         _mapper.Map(context.Message, customer);
 
-        await _unitOfWork.Customers.UpdateAsync(customer, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _provider.Customers.UpdateAsync(customer, cancellationToken);
     }
 }

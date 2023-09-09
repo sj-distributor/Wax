@@ -19,7 +19,7 @@ public class GetCustomerTests : CustomerTestFixture
 
     public GetCustomerTests()
     {
-        _handler = new GetCustomerRequestHandler(UnitOfWork);
+        _handler = new GetCustomerRequestHandler(RepositoryProvider);
     }
 
 
