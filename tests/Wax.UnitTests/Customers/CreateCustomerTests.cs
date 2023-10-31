@@ -18,7 +18,7 @@ public class CreateCustomerTests : CustomerTestFixture
 
     public CreateCustomerTests()
     {
-        _handler = new CreateCustomerCommandHandler(Mapper, Customers);
+        _handler = new CreateCustomerCommandHandler(Mapper, CustomerRepository);
     }
 
     [Fact]
@@ -29,7 +29,7 @@ public class CreateCustomerTests : CustomerTestFixture
             Name = "microsoft"
         };
 
-        Customers.FindByNameAsync(command.Name).Returns(new Customer { Name = "google" });
+        CustomerRepository.IsUniqueAsync(command.Name).Returns(false);
 
         await Should.ThrowAsync<CustomerNameAlreadyExistsException>(async () =>
             await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None));
@@ -44,10 +44,10 @@ public class CreateCustomerTests : CustomerTestFixture
             Contact = "+861306888888"
         };
 
-        Customers.FindByNameAsync(command.Name).ReturnsNull();
+        CustomerRepository.IsUniqueAsync(command.Name).Returns(true);
 
         await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None);
 
-        await Customers.Received().InsertAsync(Arg.Any<Customer>());
+        await CustomerRepository.Received().InsertAsync(Arg.Any<Customer>());
     }
 }

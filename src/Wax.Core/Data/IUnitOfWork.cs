@@ -16,6 +16,15 @@ public class UnitOfWork : IUnitOfWork
 
     public Task CommitAsync(CancellationToken cancellationToken = default)
     {
-        return _context.HasEntitiesChanged ? _context.SaveChangesAsync(cancellationToken) : Task.CompletedTask;
+        return _context.SaveChangesAsync(cancellationToken);
+    }
+}
+
+public static class UnitOfWorkExtensions
+{
+    public static async Task WithUnitOfWork(this IUnitOfWork uow, Func<Task> func)
+    {
+        await func();
+        await uow.CommitAsync();
     }
 }

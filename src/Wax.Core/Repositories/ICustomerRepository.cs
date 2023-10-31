@@ -5,19 +5,19 @@ using Wax.Core.Domain.Customers;
 
 namespace Wax.Core.Repositories;
 
-public interface ICustomerRepository : IBasicRepository<Customer>
+public interface ICustomerRepository : IBasicRepository<Customer>, IScopedDependency
 {
-    Task<Customer> FindByNameAsync(string name);
+    Task<bool> IsUniqueAsync(string name);
 }
 
-public class CustomerRepository : BasicRepository<Customer>, ICustomerRepository, IScopedDependency
+public class CustomerRepository : BasicRepository<Customer>, ICustomerRepository
 {
     public CustomerRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
     }
 
-    public Task<Customer> FindByNameAsync(string name)
+    public async Task<bool> IsUniqueAsync(string name)
     {
-        return Table.FirstOrDefaultAsync(c => c.Name == name);
+        return !await Table.AnyAsync(c => c.Name == name);
     }
 }

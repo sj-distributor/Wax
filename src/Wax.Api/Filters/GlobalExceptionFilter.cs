@@ -42,6 +42,7 @@ public class GlobalExceptionFilter : IExceptionFilter
 
         var problemDetails = new ProblemDetails
         {
+            Type = context.Exception.GetType().Name,
             Status = StatusCodes.Status409Conflict,
             Title = "A business error occur.",
             Detail = context.Exception.Message,
@@ -59,6 +60,7 @@ public class GlobalExceptionFilter : IExceptionFilter
 
         var details = new ProblemDetails
         {
+            Type = nameof(EntityNotFoundException),
             Status = StatusCodes.Status404NotFound,
             Title = "The specified resource was not found.",
             Detail = exception.Message,
@@ -72,7 +74,10 @@ public class GlobalExceptionFilter : IExceptionFilter
         var exception = context.Exception as FluentValidation.ValidationException;
 
         var details = new ValidationProblemDetails(exception.Errors.GroupBy(e => e.PropertyName, e => e.ErrorMessage)
-            .ToDictionary(failureGroup => failureGroup.Key, failureGroup => failureGroup.ToArray()));
+            .ToDictionary(failureGroup => failureGroup.Key, failureGroup => failureGroup.ToArray()))
+        {
+            Type = nameof(FluentValidation.ValidationException)
+        };
 
         context.Result = new BadRequestObjectResult(details);
 
@@ -85,6 +90,7 @@ public class GlobalExceptionFilter : IExceptionFilter
 
         var problemDetails = new ProblemDetails
         {
+            Type = context.Exception.GetType().Name,
             Status = StatusCodes.Status500InternalServerError,
             Title = "Internal error.",
             Detail = _env.IsDevelopment() ? context.Exception.Message : "An error occur. Try it again later."
