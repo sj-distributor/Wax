@@ -1,6 +1,8 @@
 using Mediator.Net;
 using Microsoft.AspNetCore.Mvc;
 using Wax.Messages.Commands.Customers;
+using Wax.Messages.Dtos.Customers;
+using Wax.Messages.Requests;
 using Wax.Messages.Requests.Customers;
 
 namespace Wax.Api.Controllers
@@ -16,12 +18,11 @@ namespace Wax.Api.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("{id:guid}")]
-        [ProducesResponseType(typeof(GetCustomerResponse), 200)]
-        public async Task<IActionResult> GetAsync(Guid id)
+        [HttpGet]
+        [ProducesResponseType(typeof(PaginatedResponse<CustomerShortInfo>), 200)]
+        public async Task<IActionResult> GetListAsync([FromQuery] GetCustomersRequest request)
         {
-            var response = await _mediator.RequestAsync<GetCustomerRequest, GetCustomerResponse>(
-                new GetCustomerRequest { CustomerId = id });
+            var response = await _mediator.RequestAsync<GetCustomersRequest, PaginatedResponse<CustomerShortInfo>>(request);
 
             return Ok(response);
         }

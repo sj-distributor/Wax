@@ -9,11 +9,11 @@ namespace Wax.UnitTests.Customers;
 public class CustomerTestFixture
 {
     protected readonly IMapper Mapper;
-    protected readonly ICustomerRepository Customers;
+    protected readonly ICustomerRepository CustomerRepository;
 
     protected CustomerTestFixture()
     {
         Mapper = new MapperConfiguration(x => x.AddProfile(new CustomerProfile())).CreateMapper();
-        Customers = Substitute.For<ICustomerRepository>();
+        CustomerRepository = Substitute.For<ICustomerRepository>();
     }
 }

@@ -19,7 +19,7 @@ public class UpdateCustomerTests : CustomerTestFixture
 
     public UpdateCustomerTests()
     {
-        _handler = new UpdateCustomerCommandHandler(Mapper, Customers);
+        _handler = new UpdateCustomerCommandHandler(Mapper, CustomerRepository);
     }
 
     [Fact]
@@ -31,10 +31,10 @@ public class UpdateCustomerTests : CustomerTestFixture
             Name = "microsoft"
         };
 
-        Customers.GetByIdAsync(command.CustomerId)
+        CustomerRepository.GetByIdAsync(command.CustomerId)
             .Returns(new Customer { Id = command.CustomerId, Name = "google" });
 
-        Customers.FindByNameAsync(command.Name).Returns(new Customer { Name = "meta" });
+        CustomerRepository.IsUniqueAsync(command.Name).Returns(false);
 
         await Should.ThrowAsync<CustomerNameAlreadyExistsException>(async () =>
             await _handler.Handle(new ReceiveContext<UpdateCustomerCommand>(command), CancellationToken.None));
@@ -52,14 +52,14 @@ public class UpdateCustomerTests : CustomerTestFixture
             Contact = "+861306888888"
         };
 
-        Customers.GetByIdAsync(command.CustomerId).Returns(customer);
-        Customers.FindByNameAsync(command.Name).ReturnsNull();
+        CustomerRepository.GetByIdAsync(command.CustomerId).Returns(customer);
+        CustomerRepository.IsUniqueAsync(command.Name).Returns(true);
 
         await _handler.Handle(new ReceiveContext<UpdateCustomerCommand>(command), CancellationToken.None);
 
         customer.Name.ShouldBe(command.Name);
         customer.Contact.ShouldBe(command.Contact);
 
-        await Customers.Received().UpdateAsync(Arg.Any<Customer>());
+        await CustomerRepository.Received().UpdateAsync(Arg.Any<Customer>());
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using Shouldly;
 using Wax.Api;
+using Wax.Core.Domain.Customers.Exceptions;
 using Wax.Messages.Commands.Customers;
 using Xunit;
 
@@ -38,23 +39,6 @@ namespace Wax.E2ETests
         }
 
         [Fact]
-        public async Task ShouldReturn404StatusCodeWhenEntityNotFound()
-        {
-            var client = _factory.CreateClient();
-
-            var response = await client.GetAsync($"/customers/{Guid.NewGuid()}");
-
-            response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-
-            var content = await response.Content.ReadAsStringAsync();
-
-            var problemDetails = JsonConvert.DeserializeObject<ProblemDetails>(content);
-
-            problemDetails.Title.ShouldBe("The specified resource was not found.");
-            problemDetails.Detail.ShouldStartWith("Entity not found");
-        }
-
-        [Fact]
         public async Task ShouldReturn409StatusCodeWhenBusinessError()
         {
             var message = new CreateCustomerCommand
@@ -76,6 +60,7 @@ namespace Wax.E2ETests
 
             var problemDetails = JsonConvert.DeserializeObject<ProblemDetails>(content);
 
+            problemDetails.Type.ShouldBe(nameof(CustomerNameAlreadyExistsException));
             problemDetails.Title.ShouldBe("A business error occur.");
             problemDetails.Detail.ShouldBe("Customer with this name already exists.");
         }

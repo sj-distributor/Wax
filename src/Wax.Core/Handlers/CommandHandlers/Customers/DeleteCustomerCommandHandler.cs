@@ -1,6 +1,7 @@
+using FluentValidation;
 using Mediator.Net.Context;
 using Mediator.Net.Contracts;
-using Wax.Core.Data;
+using Wax.Core.Middlewares.FluentMessageValidator;
 using Wax.Core.Repositories;
 using Wax.Messages.Commands.Customers;
 
@@ -17,8 +18,16 @@ public class DeleteCustomerCommandHandler: ICommandHandler<DeleteCustomerCommand
     
     public async Task Handle(IReceiveContext<DeleteCustomerCommand> context, CancellationToken cancellationToken)
     {
-        var customer = await _customerRepository.GetByIdAsync(context.Message.CustomerId);
+        var customer = await _customerRepository.GetByIdAsync(context.Message.CustomerId, cancellationToken);
 
-        await _customerRepository.DeleteAsync(customer);
+        await _customerRepository.DeleteAsync(customer, cancellationToken);
+    }
+}
+
+public class DeleteCustomerCommandValidator : FluentMessageValidator<DeleteCustomerCommand>
+{
+    public DeleteCustomerCommandValidator()
+    {
+        RuleFor(v => v.CustomerId).NotEmpty();
     }
 }

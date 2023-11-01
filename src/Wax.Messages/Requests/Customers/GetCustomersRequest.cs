@@ -1,14 +1,9 @@
-﻿using Mediator.Net.Contracts;
-using Wax.Messages.Dtos.Customers;
+using Mediator.Net.Contracts;
 
 namespace Wax.Messages.Requests.Customers;
 
-public class GetCustomerRequest : IRequest
+public class GetCustomersRequest : IRequest
 {
-    public Guid CustomerId { get; set; }
-}
-
-public class GetCustomerResponse : IResponse
-{
-    public CustomerShortInfo Customer { get; set; }
+    public int PageIndex { get; set; }
+    public int PageSize { get; set; }
 }
