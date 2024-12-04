@@ -33,10 +33,9 @@ public class Startup
     {
         var serviceProvider = _serviceCollection.BuildServiceProvider();
 
-        var logger = serviceProvider.GetRequiredService<ILogger>();
         var userContext = serviceProvider.GetRequiredService<IUserContext>();
 
-        WaxStartup.Initialize(builder, "", logger, userContext, Configuration);
+        WaxStartup.Initialize(builder, "", Log.Logger, userContext, Configuration);
     }
 
     // Configure is where you add middleware. This is called after

@@ -29,7 +29,7 @@ namespace Wax.Api.Controllers
         public async Task<IActionResult> CreateAsync([FromBody] CreateCustomerCommand command)
         {
             var response = await _mediator.SendAsync<CreateCustomerCommand, CreateCustomerResponse>(command);
-            return CreatedAtRoute(nameof(GetListAsync), response);
+            return CreatedAtAction("GetList", response);
         }
 
         [HttpPut]
