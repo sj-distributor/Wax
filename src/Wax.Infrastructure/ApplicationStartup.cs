@@ -7,7 +7,7 @@ using Wax.Infrastructure.Settings;
 
 namespace Wax.Infrastructure;
 
-public class WaxStartup
+public class ApplicationStartup
 {
     public static void Initialize(
         ContainerBuilder builder,
@@ -16,7 +16,7 @@ public class WaxStartup
         IUserContext userContext,
         IConfiguration configuration)
     {
-        var assemblies = new[] { typeof(IUserContext).Assembly, typeof(WaxStartup).Assembly };
+        var assemblies = new[] { typeof(IUserContext).Assembly, typeof(ApplicationStartup).Assembly };
 
         builder.RegisterModule(new LoggingModule(logger));
         builder.RegisterModule(new AuthenticationModule(userContext));

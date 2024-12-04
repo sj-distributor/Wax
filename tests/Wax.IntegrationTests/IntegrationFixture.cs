@@ -19,7 +19,7 @@ public class IntegrationFixture : IAsyncLifetime
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", false, true).Build();
 
-        WaxStartup.Initialize(
+        ApplicationStartup.Initialize(
             containerBuilder, 
             configuration.GetConnectionString("Default") ?? string.Empty,
             logger.Object, new IntegrationTestUser(), 
