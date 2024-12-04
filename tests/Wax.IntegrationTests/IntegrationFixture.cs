@@ -1,13 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using Autofac;
+﻿using System.IO;
 using Microsoft.Extensions.Configuration;
-using NSubstitute;
+using Moq;
 using Serilog;
-using Wax.Core;
-using Wax.Core.Data;
-using Xunit;
+using Wax.Infrastructure;
 
 namespace Wax.IntegrationTests;
 
@@ -18,15 +13,18 @@ public class IntegrationFixture : IAsyncLifetime
     public IntegrationFixture()
     {
         var containerBuilder = new ContainerBuilder();
-        var logger = Substitute.For<ILogger>();
+        var logger = new Mock<ILogger>();
 
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", false, true).Build();
 
-        containerBuilder.RegisterModule(new ApplicationModule(logger, new IntegrationTestUser(), configuration,
-            typeof(IntegrationFixture).Assembly));
-
+        WaxStartup.Initialize(
+            containerBuilder, 
+            configuration.GetConnectionString("Default") ?? string.Empty,
+            logger.Object, new IntegrationTestUser(), 
+            configuration);
+        
         LifetimeScope = containerBuilder.Build();
     }
 

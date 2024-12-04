@@ -1,13 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Mediator.Net;
-using Shouldly;
-using Wax.Core.Exceptions;
-using Wax.Core.Repositories;
-using Wax.Messages.Commands.Customers;
-using Xunit;
-
-namespace Wax.IntegrationTests.Customers;
+﻿namespace Wax.IntegrationTests.Customers;
 
 public class CustomerTests : IntegrationTestBase
 {
@@ -18,7 +9,7 @@ public class CustomerTests : IntegrationTestBase
     [Fact]
     public async Task ShouldCreateNewCustomer()
     {
-        await Run<IMediator, ICustomerRepository>(async (mediator, repo) =>
+        await Run<IMediator, IApplicationDbContext>(async (mediator, db) =>
         {
             var createCustomerCommand = new CreateCustomerCommand
             {
@@ -27,11 +18,12 @@ public class CustomerTests : IntegrationTestBase
                 Contact = "(800) 426-9400"
             };
 
-            var createCustomerResponse = await mediator.SendAsync<CreateCustomerCommand, CreateCustomerResponse>(
+            var response = await mediator.SendAsync<CreateCustomerCommand, CreateCustomerResponse>(
                 createCustomerCommand);
 
-            var customer = await repo.GetByIdAsync(createCustomerResponse.CustomerId);
+            var customer = await db.Customers.FindAsync(response.CustomerId);
 
+            customer.ShouldNotBeNull();
             customer.Name.ShouldBe(createCustomerCommand.Name);
             customer.Address.ShouldBe(createCustomerCommand.Address);
         });
@@ -42,7 +34,7 @@ public class CustomerTests : IntegrationTestBase
     {
         var customerId = await CreateDefaultCustomer();
 
-        await Run<IMediator, ICustomerRepository>(async (mediator, repo) =>
+        await Run<IMediator, IApplicationDbContext>(async (mediator, db) =>
         {
             var updateCustomerCommand = new UpdateCustomerCommand
             {
@@ -54,8 +46,9 @@ public class CustomerTests : IntegrationTestBase
 
             await mediator.SendAsync(updateCustomerCommand);
 
-            var customer = await repo.GetByIdAsync(customerId);
+            var customer = await db.Customers.FindAsync(customerId);
 
+            customer.ShouldNotBeNull();
             customer.Name.ShouldBe(updateCustomerCommand.Name);
             customer.Address.ShouldBe(updateCustomerCommand.Address);
         });
@@ -66,15 +59,15 @@ public class CustomerTests : IntegrationTestBase
     {
         var customerId = await CreateDefaultCustomer();
 
-        await Run<IMediator, ICustomerRepository>(async (mediator, repo) =>
+        await Run<IMediator, IApplicationDbContext>(async (mediator, db) =>
         {
             await mediator.SendAsync(new DeleteCustomerCommand
             {
                 CustomerId = customerId
             });
 
-            await Should.ThrowAsync<EntityNotFoundException>(async () =>
-                await repo.GetByIdAsync(customerId));
+            var customer = await db.Customers.FindAsync(customerId);
+            customer.ShouldBeNull();
         });
     }
 

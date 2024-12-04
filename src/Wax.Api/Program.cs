@@ -1,5 +1,4 @@
 using Autofac.Extensions.DependencyInjection;
-using Serilog;
 
 namespace Wax.Api;
 

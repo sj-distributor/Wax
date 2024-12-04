@@ -1,12 +1,4 @@
-﻿using Autofac;
-using Wax.Api.Authentication;
-using Wax.Api.Extensions;
-using Wax.Core.Services.Identity;
-using Serilog;
-using Wax.Api.Filters;
-using Wax.Core;
-
-namespace Wax.Api;
+﻿namespace Wax.Api;
 
 public class Startup
 {
@@ -23,10 +15,10 @@ public class Startup
     // called by the runtime before the ConfigureContainer method, below.
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddControllers(options => { options.Filters.Add<GlobalExceptionFilter>(); });
+        services.AddControllers();
         services.AddOptions();
         services.AddCustomSwagger();
-        services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<IUserContext, UserContext>();
         services.AddLogging();
         services.AddHttpContextAccessor();
 
@@ -41,13 +33,10 @@ public class Startup
     {
         var serviceProvider = _serviceCollection.BuildServiceProvider();
 
-        var currentUser = serviceProvider.GetRequiredService<ICurrentUser>();
+        var logger = serviceProvider.GetRequiredService<ILogger>();
+        var userContext = serviceProvider.GetRequiredService<IUserContext>();
 
-        // Register your own things directly with Autofac here. Don't
-        // call builder.Populate(), that happens in AutofacServiceProviderFactory
-        // for you.
-        builder.RegisterModule(new ApplicationModule(Log.Logger, currentUser, Configuration,
-            typeof(Startup).Assembly));
+        WaxStartup.Initialize(builder, "", logger, userContext, Configuration);
     }
 
     // Configure is where you add middleware. This is called after
@@ -58,7 +47,7 @@ public class Startup
         if (env.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Barcode.Api.xml"); });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Wax.Api.xml"); });
         }
 
         app.UseRouting();
