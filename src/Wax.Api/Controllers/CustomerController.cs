@@ -1,10 +1,3 @@
-using Mediator.Net;
-using Microsoft.AspNetCore.Mvc;
-using Wax.Messages.Commands.Customers;
-using Wax.Messages.Dtos.Customers;
-using Wax.Messages.Requests;
-using Wax.Messages.Requests.Customers;
-
 namespace Wax.Api.Controllers
 {
     [ApiController]
@@ -22,7 +15,8 @@ namespace Wax.Api.Controllers
         [ProducesResponseType(typeof(PaginatedResponse<CustomerShortInfo>), 200)]
         public async Task<IActionResult> GetListAsync([FromQuery] GetCustomersRequest request)
         {
-            var response = await _mediator.RequestAsync<GetCustomersRequest, PaginatedResponse<CustomerShortInfo>>(request);
+            var response =
+                await _mediator.RequestAsync<GetCustomersRequest, PaginatedResponse<CustomerShortInfo>>(request);
 
             return Ok(response);
         }
@@ -32,23 +26,30 @@ namespace Wax.Api.Controllers
         public async Task<IActionResult> CreateAsync([FromBody] CreateCustomerCommand command)
         {
             var response = await _mediator.SendAsync<CreateCustomerCommand, CreateCustomerResponse>(command);
-            return Ok(response);
+            return CreatedAtAction("GetList", response);
         }
 
-        [HttpPut]
-        [ProducesResponseType(200)]
-        public async Task<IActionResult> UpdateAsync([FromBody] UpdateCustomerCommand command)
+        [HttpPut("{customerId:guid}")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> UpdateAsync(Guid customerId, [FromBody] UpdateCustomerModel model)
         {
-            await _mediator.SendAsync(command);
-            return Ok();
+            await _mediator.SendAsync(new UpdateCustomerCommand
+            {
+                CustomerId = customerId,
+                Name = model.Name,
+                Contact = model.Contact,
+                Address = model.Address
+            });
+            
+            return NoContent();
         }
 
         [HttpDelete]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         public async Task<IActionResult> DeleteAsync([FromBody] DeleteCustomerCommand command)
         {
             await _mediator.SendAsync(command);
-            return Ok();
+            return NoContent();
         }
     }
 }

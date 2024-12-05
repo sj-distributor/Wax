@@ -1,8 +1,13 @@
-using Wax.Core.Services.Identity;
-
 namespace Wax.IntegrationTests;
 
-public class IntegrationTestUser : ICurrentUser
+public class IntegrationTestUser : IUserContext
 {
-    public string Id => "_wax_test_user";
+    public string GetCurrentUserId()
+    {
+        return "__wax_tester";
+    }
+
+    public void SetCurrentUserId(string userId = null)
+    {
+    }
 }

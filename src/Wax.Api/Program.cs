@@ -1,5 +1,4 @@
 using Autofac.Extensions.DependencyInjection;
-using Serilog;
 
 namespace Wax.Api;
 
@@ -47,7 +46,7 @@ public partial class Program
         return builder.Build();
     }
 
-    private static Serilog.ILogger CreateSerilogLogger(IConfiguration configuration)
+    private static ILogger CreateSerilogLogger(IConfiguration configuration)
     {
         var seqServerUrl = configuration["Serilog:Seq:ServerUrl"];
         var seqApiKey = configuration["Serilog:Seq:ApiKey"];

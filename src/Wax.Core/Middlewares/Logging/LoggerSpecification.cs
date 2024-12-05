@@ -1,9 +1,6 @@
 using System.Runtime.ExceptionServices;
-using Mediator.Net.Context;
-using Mediator.Net.Contracts;
 using Mediator.Net.Pipeline;
 using Serilog;
-using Wax.Core.Extensions;
 
 namespace Wax.Core.Middlewares.Logging;
 

@@ -1,16 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Mediator.Net.Context;
-using NSubstitute;
-using NSubstitute.ReturnsExtensions;
-using Shouldly;
-using Wax.Core.Domain.Customers;
-using Wax.Core.Domain.Customers.Exceptions;
-using Wax.Core.Handlers.CommandHandlers.Customers;
-using Wax.Messages.Commands.Customers;
-using Xunit;
-
-namespace Wax.UnitTests.Customers;
+﻿namespace Wax.UnitTests.Customers;
 
 public class CreateCustomerTests : CustomerTestFixture
 {
@@ -18,36 +6,26 @@ public class CreateCustomerTests : CustomerTestFixture
 
     public CreateCustomerTests()
     {
-        _handler = new CreateCustomerCommandHandler(Mapper, CustomerRepository);
+        _handler = new CreateCustomerCommandHandler(MockCustomerService.Object);
     }
 
     [Fact]
     public async Task ShouldNotCreateCustomerWhenNameAlreadyExists()
     {
-        var command = new CreateCustomerCommand
-        {
-            Name = "microsoft"
-        };
+        MockCustomerService.Setup(x => x.IsUniqueCustomerNameAsync(It.IsAny<string>())).ReturnsAsync(false);
 
-        CustomerRepository.IsUniqueAsync(command.Name).Returns(false);
-
-        await Should.ThrowAsync<CustomerNameAlreadyExistsException>(async () =>
-            await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None));
+        await Should.ThrowAsync<WaxException>(async () =>
+            await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(new CreateCustomerCommand()),
+                CancellationToken.None));
     }
 
-    [Fact]
-    public async Task ShouldCallInsert()
+    [Theory,AutoData]
+    public async Task ShouldCallInsertCustomer(CreateCustomerCommand command)
     {
-        var command = new CreateCustomerCommand
-        {
-            Name = "microsoft",
-            Contact = "+861306888888"
-        };
-
-        CustomerRepository.IsUniqueAsync(command.Name).Returns(true);
+        MockCustomerService.Setup(x => x.IsUniqueCustomerNameAsync(It.IsAny<string>())).ReturnsAsync(true);
 
         await _handler.Handle(new ReceiveContext<CreateCustomerCommand>(command), CancellationToken.None);
 
-        await CustomerRepository.Received().InsertAsync(Arg.Any<Customer>());
+        MockCustomerService.Verify(x => x.InsertCustomerAsync(It.IsAny<Customer>()), Times.Once);
     }
 }

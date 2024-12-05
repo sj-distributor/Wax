@@ -1,6 +1,4 @@
 ﻿using System.Runtime.ExceptionServices;
-using Mediator.Net.Context;
-using Mediator.Net.Contracts;
 using Mediator.Net.Pipeline;
 
 namespace Wax.Core.Middlewares.FluentMessageValidator;

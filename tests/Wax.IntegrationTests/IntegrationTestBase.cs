@@ -1,9 +1,3 @@
-using System;
-using System.Threading.Tasks;
-using Autofac;
-using Wax.Core.Data;
-using Xunit;
-
 namespace Wax.IntegrationTests;
 
 [Collection("Sequential")]

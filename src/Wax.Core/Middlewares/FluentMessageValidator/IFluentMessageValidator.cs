@@ -1,6 +1,4 @@
-using FluentValidation;
 using FluentValidation.Results;
-using Mediator.Net.Contracts;
 
 namespace Wax.Core.Middlewares.FluentMessageValidator;
 
