@@ -1,6 +1,3 @@
-using Mediator.Net;
-using Microsoft.AspNetCore.Mvc;
-
 namespace Wax.Api.Controllers
 {
     [ApiController]
@@ -32,11 +29,18 @@ namespace Wax.Api.Controllers
             return CreatedAtAction("GetList", response);
         }
 
-        [HttpPut]
+        [HttpPut("{customerId:guid}")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdateAsync([FromBody] UpdateCustomerCommand command)
+        public async Task<IActionResult> UpdateAsync(Guid customerId, [FromBody] UpdateCustomerModel model)
         {
-            await _mediator.SendAsync(command);
+            await _mediator.SendAsync(new UpdateCustomerCommand
+            {
+                CustomerId = customerId,
+                Name = model.Name,
+                Contact = model.Contact,
+                Address = model.Address
+            });
+            
             return NoContent();
         }
 
